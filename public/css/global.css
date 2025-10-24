@@ -1,0 +1,61 @@
+/* =============================================== */
+/* GLOBAL.CSS                     */
+/* =============================================== */
+
+/* Font dasar untuk seluruh situs (Contoh) */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Warna latar belakang netral */
+}
+
+/*
+ * .card
+ * Style kartu putih generik dengan bayangan.
+ * Digunakan di: layanan_umum.blade.php, home.blade.php
+ */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+
+/*
+ * .page-section
+ * Wrapper standar untuk setiap bagian utama halaman.
+ * Digunakan di: layanan_umum.blade.php, visi_misi.blade.php, struktur_organisasi.blade.php
+ */
+.page-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+    width: 100%;
+}
+
+/*
+ * .btn & .btn-warning
+ * Style tombol generik.
+ * Digunakan di: home.blade.php
+ */
+.btn {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: inline-block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.btn-warning {
+    background-color: #FFD600;
+    color: #0B2D82;
+}
