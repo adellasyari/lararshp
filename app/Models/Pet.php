@@ -43,9 +43,10 @@ class Pet extends Model
         return $this->belongsTo(RasHewan::class, 'idras_hewan', 'idras_hewan');
     }
 
-    /**
-     * Relasi 'jenisHewan()' Dihapus
-     * Kenapa? Karena tabel 'pet' Anda tidak punya 'idjenis_hewan'.
-     * Kita akan mengambil Jenis Hewan MELALUI relasi 'rasHewan'.
-     */
+    public function rekamMedis()
+    {
+        return $this->hasMany(RekamMedis::class, 'idpet', 'idpet');
+    }
+
+    
 }

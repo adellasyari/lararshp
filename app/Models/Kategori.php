@@ -10,7 +10,7 @@ class Kategori extends Model
     protected $table = 'kategori';
 
     // 2. Menentukan primary key (jika bukan 'id')
-    protected $primaryKey = 'id_kategori';
+    protected $primaryKey = 'idkategori';
 
     // 3. Menentukan kolom yang boleh diisi (untuk keamanan)
     protected $fillable = [

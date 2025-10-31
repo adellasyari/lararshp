@@ -1,69 +1,80 @@
-<!DOCTYPE html>
-<html lang="id">
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSHP - Rumah Sakit Hewan Pendidikan</title>
-    
-    {{-- Menautkan file CSS global dan spesifik situs --}}
-    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Laravel') }}</title>
+
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+
+    <!-- Scripts -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
+    <div id="app">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url('/') }}">
+                    {{ config('app.name', 'Laravel') }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-    {{-- =============================================== --}}
-    {{--                BAGIAN NAVBAR                  --}}
-    {{-- =============================================== --}}
-    <nav class="site-nav">
-        <ul class="site-nav-list">
-            <li class="site-nav-item">
-                <a href="{{ route('site.home') }}" class="site-nav-link">Home</a>
-            </li>
-            <li class="site-nav-item">
-                <a href="{{ route('site.struktur_organisasi') }}" class="site-nav-link">Struktur Organisasi</a>
-            </li>
-            <li class="site-nav-item">
-                <a href="{{ route('site.layanan_umum') }}" class="site-nav-link">Layanan Umum</a>
-            </li>
-            <li class="site-nav-item">
-                <a href="{{ route('site.visi_misi') }}" class="site-nav-link">Visi Misi & Tujuan</a>
-            </li>
-            <li class="site-nav-item">
-                <a href="{{ route('site.berita') }}" class="site-nav-link">Berita Terbaru</a>
-            </li>
-            <li class="site-nav-item">
-                <a href="{{ route('auth.login') }}" class="site-nav-link">Login</a>
-            </li>
-        </ul>
-    </nav>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <!-- Left Side Of Navbar -->
+                    <ul class="navbar-nav me-auto">
 
-    <div class="logo-container">
-        <img src="{{ asset('asset/LogoRSHP.webp')}}" alt="Gambar RSHP" class="logo-image">
+                    </ul>
+
+                    <!-- Right Side Of Navbar -->
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Authentication Links -->
+                        @guest
+                            @if (Route::has('login'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                </li>
+                            @endif
+
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                </li>
+                            @endif
+                        @else
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    {{ Auth::user()->nama }}
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </div>
+                            </li>
+                        @endguest
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="py-4">
+            @yield('content')
+        </main>
     </div>
-
-    {{-- =============================================== --}}
-    {{--         SLOT UNTUK KONTEN HALAMAN             --}}
-    {{-- =============================================== --}}
-    <main>
-        @yield('content')
-    </main>
-
-    {{-- =============================================== --}}
-    {{--                BAGIAN FOOTER                  --}}
-    {{-- =============================================== --}}
-    <footer class="site-footer">
-        <div class="footer-heading">
-            Terima Kasih Telah Mengunjungi Rumah Sakit Hewan Pendidikan Universitas Airlangga
-        </div>
-        <div class="footer-subheading">
-            Bersama RSHP UNAIR, wujudkan kesehatan hewan yang lebih baik untuk masa depan yang cerah.
-        </div>
-        <div class="footer-copyright">
-            &copy; {{ date('Y') }} Rumah Sakit Hewan Pendidikan Universitas Airlangga. All rights reserved.
-        </div>
-    </footer>
-
-    {{-- <script src="{{ asset('js/app.js') }}"></script> --}}
-
 </body>
 </html>
