@@ -1,21 +1,11 @@
-# TODO: Buat Tampilan Index untuk Resepsionis - Temu Dokter
+# TODO: Create Index View for Receptionists to Display Doctor Appointments
 
-## Step 1: Buat Migration untuk Temu Dokter
-- Buat migration file untuk tabel temu_dokter dengan field: id, tanggal_jadwal, waktu_jadwal, status, idpet, idpemilik, idrekam_medis, created_at, updated_at
-
-## Step 2: Buat Model TemuDokter
-- Buat file `app/Models/TemuDokter.php` dengan relasi ke Pet, Pemilik, dan RekamMedis
-
-## Step 3: Buat Controller TemuDokter untuk Resepsionis
-- Buat file `app/Http/Controllers/Resepsionis/TemuDokterController.php`
-- Implementasikan method index() untuk menampilkan data temu dokter dengan relasi
-
-## Step 4: Buat View Index Temu Dokter untuk Resepsionis
-- Buat file `resources/views/resepsionis/temu-dokter/index.blade.php`
-- Buat tabel untuk menampilkan data temu dokter (Tanggal, Waktu, Status, Pet, Pemilik, dll.)
-
-## Step 5: Update Routes
-- Tambahkan route untuk resepsionis temu-dokter di `routes/web.php` dalam middleware isResepsionis
-
-## Step 6: Update Dashboard Resepsionis
-- Tambahkan menu Temu Dokter di dashboard resepsionis
+## Steps to Complete
+1. Update the temu_dokter migration to include necessary fields (idpet, idpemilik, tanggal, waktu, status).
+2. Create the TemuDokter model with relationships to Pet and Pemilik.
+3. Create TemuDokterController in Resepsionis namespace with index method.
+4. Create the index view for temu dokter in resepsionis.
+5. Add routes for temu dokter in web.php under resepsionis middleware.
+6. Update the resepsionis dashboard to include a link to temu dokter.
+7. Run the migration to apply database changes.
+8. Test the functionality.

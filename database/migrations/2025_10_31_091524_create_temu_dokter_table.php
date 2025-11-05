@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('temu_dokter', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('idpet');
+            $table->unsignedBigInteger('idpemilik');
+            $table->date('tanggal');
+            $table->time('waktu');
+            $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
+
+            $table->foreign('idpet')->references('idpet')->on('pet');
+            $table->foreign('idpemilik')->references('idpemilik')->on('pemilik');
         });
     }
 

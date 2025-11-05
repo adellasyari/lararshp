@@ -109,6 +109,7 @@ Auth::routes();
         Route::get('/resepsionis/pemilik', [App\Http\Controllers\Resepsionis\PemilikController::class, 'index'])->name('resepsionis.pemilik.index');
         Route::get('/resepsionis/hewan', [App\Http\Controllers\Resepsionis\PetController::class, 'index'])->name('resepsionis.hewan.index');
         Route::get('/resepsionis/rekam-medis', [App\Http\Controllers\Resepsionis\RekamMedisController::class, 'index'])->name('resepsionis.rekam-medis.index');
+        Route::get('/resepsionis/temu-dokter', [App\Http\Controllers\Resepsionis\TemuDokterController::class, 'index'])->name('resepsionis.temu-dokter.index');
     });
 
     // =========================================================================
