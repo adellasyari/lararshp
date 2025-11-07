@@ -18,8 +18,10 @@ class RekamMedis extends Model
         'temuan_klinis',
         'idpet',
         'dokter_pemeriksa',
-
     ];
+
+    // Table only has created_at (no updated_at), so disable automatic timestamps
+    public $timestamps = false;
 
     public function pet()
     {
@@ -29,6 +31,25 @@ class RekamMedis extends Model
     public function roleUser()
     {
         return $this->belongsTo(RoleUser::class, 'dokter_pemeriksa', 'idrole_user');
+    }
+    
+    /**
+     * Alias/shortcut to access dokter (User) easily from RekamMedis.
+     * This returns the RoleUser relation (dokter assignment) —
+     * we also provide a dynamic attribute accessor 'dokter' that returns the related User.
+     */
+    public function dokter()
+    {
+        return $this->belongsTo(RoleUser::class, 'dokter_pemeriksa', 'idrole_user');
+    }
+
+    /**
+     * Dynamic attribute to get the User model of the dokter pemeriksa.
+     * Usage: $rekamMedis->dokter->nama
+     */
+    public function getDokterAttribute()
+    {
+        return $this->roleUser ? $this->roleUser->user : null;
     }
     
     public function pemilik()

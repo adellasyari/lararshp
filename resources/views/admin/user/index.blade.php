@@ -1,47 +1,61 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar User</title>
-    <style>
-        table { width: 80%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
+@section('title', 'Daftar User')
+@section('content')
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>Daftar User dengan Role</h4>
+                        <div>
+                            <a href="{{ route('admin.user.create') }}" class="btn btn-primary me-2">Tambah User</a>
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Kembali ke Dashboard</a>
+                        </div>
+                    </div>
 
-    <h1>Daftar User dengan Role</h1>
+                    <div class="card-body">
+                        @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($users as $index => $item)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $item->nama }}</td>
-                <td>{{ $item->email }}</td>
-                <td>
-                    @foreach ($item->roles as $role)
-                        {{ $role->nama_role }}@if (!$loop->last), @endif
-                    @endforeach
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="4" style="text-align: center;">Data user masih kosong.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-</body>
-</html>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($users as $index => $item)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $item->nama }}</td>
+                                        <td>{{ $item->email }}</td>
+                                        <td>
+                                            @foreach ($item->roles as $role)
+                                                {{ $role->nama_role }}@if (!$loop->last), @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.user.edit', $item->iduser) }}" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="{{ route('admin.user.destroy', $item->iduser) }}" method="POST" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Data user masih kosong.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

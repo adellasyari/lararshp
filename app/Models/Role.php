@@ -19,4 +19,8 @@ class Role extends Model
     protected $fillable = [
         'nama_role'
     ];
+
+    // Jika tabel 'role' tidak memiliki kolom created_at/updated_at
+    // maka non-aktifkan timestamps agar Eloquent tidak mencoba mengisinya.
+    public $timestamps = false;
 }

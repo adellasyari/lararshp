@@ -22,6 +22,9 @@ class TemuDokter extends Model
         'status',
     ];
 
+    // Non-aktifkan timestamps jika tabel tidak memiliki created_at/updated_at
+    public $timestamps = false;
+
     public function pet()
     {
         return $this->belongsTo(Pet::class, 'idpet', 'idpet');

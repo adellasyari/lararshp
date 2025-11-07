@@ -7,7 +7,8 @@
             <div class="card">
                 <div class="card-header">
                     <h4>Rekam Medis</h4>
-                    <a href="{{ route('admin.rekam-medis.index') }}" class="btn btn-primary">Tambah Rekam Medis</a>
+                    <a href="{{ route('admin.rekam-medis.create') }}" class="btn btn-primary">Tambah Rekam Medis</a>
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Kembali ke Dashboard</a>
                 </div>
 
                 <div class="card-body">
@@ -22,29 +23,47 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Tanggal</th>
-                                <th>Keluhan</th>
+                                <th>Anamnesa</th>
+                                <th>Temuan Klinis</th>
+                                <th>Nama Pet</th>
+                                <th>Pemilik Pet</th>
+                                <th>Ras Hewan</th>
+                                <th>Dokter Pemeriksa</th>
                                 <th>Diagnosa</th>
-                                <th>Tindakan</th>
-                                <th>Obat</th>
-                                <th>Pet</th>
-                                <th>Role User</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($rekamMediss as $rekamMedis)
+                            @forelse ($rekamMedis as $rm)
                                 <tr>
-                                    <td>{{ $rekamMedis->idrekam_medis }}</td>
-                                    <td>{{ $rekamMedis->created_at }}</td>
-                                    <td>{{ $rekamMedis->anamnesa }}</td>
-                                    <td>{{ $rekamMedis->temuan_klinis }}</td>
-                                    <td>{{ $rekamMedis->idpet }}</td>
-                                    <td>{{ $rekamMedis->dokter_pemeriksa }}</td>
-                                    <td>{{ $rekamMedis->pet ? $rekamMedis->pet->nama : 'N/A' }}</td>
-                                    <td>{{ $rekamMedis->roleUser ? $rekamMedis->roleUser->idrole_user : 'N/A' }}</td>
+                                    <td>{{ $rm->idrekam_medis }}</td>
+                                    <td>{{ $rm->created_at ? \Carbon\Carbon::parse($rm->created_at)->format('d-m-Y') : '-' }}</td>
+
+                                    <td>{{ Illuminate\Support\Str::limit($rm->anamnesa ?? '-', 80) }}</td>
+                                    <td>{{ Illuminate\Support\Str::limit($rm->temuan_klinis ?? '-', 80) }}</td>
+
+                                    <td>{{ $rm->pet->nama ?? 'Pet Dihapus' }}</td>
+                                    <td>{{ $rm->pet->pemilik->user->nama ?? 'Pemilik Dihapus' }}</td>
+                                    <td>{{ $rm->pet->rasHewan->nama_ras ?? 'Ras Dihapus' }}</td>
+
+                                    <td>{{ $rm->dokter->nama ?? 'Dokter Dihapus' }}</td>
+
+                                    <td>{{ $rm->diagnosa ?? '-' }}</td>
                                     
+                                    <td>
+                                        <a href="{{ route('admin.rekam-medis.edit', $rm->idrekam_medis) }}" class="btn btn-sm btn-warning">Edit</a>
+                                        <form action="{{ route('admin.rekam-medis.destroy', $rm->idrekam_medis) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin hapus data ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                        </form>
+                                    </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center">Data rekam medis kosong.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

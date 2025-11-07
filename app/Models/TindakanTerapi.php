@@ -20,6 +20,9 @@ class TindakanTerapi extends Model
         'idkategori_klinis'
     ];
 
+    // Non-aktifkan timestamps jika tabel tidak memiliki created_at/updated_at
+    public $timestamps = false;
+
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'idkategori', 'idkategori');

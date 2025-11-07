@@ -24,6 +24,9 @@ class Pemilik extends Model
         'iduser' // Foreign key ke tabel user
     ];
 
+    // Non-aktifkan timestamps jika tabel tidak memiliki kolom created_at/updated_at
+    public $timestamps = false;
+
     /**
      * 4. Mendefinisikan relasi kebalikannya: "Satu Pemilik DIMILIKI OLEH satu User"
      * * Nama fungsi 'user' ini akan dicari oleh relasi 'pemilik()' di model User.

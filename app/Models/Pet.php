@@ -26,6 +26,9 @@ class Pet extends Model
         'idras_hewan' // <-- Pastikan nama foreign key benar
     ];
 
+    // Non-aktifkan timestamps jika tabel tidak memiliki created_at/updated_at
+    public $timestamps = false;
+
     /**
      * Relasi: "Satu Pet DIMILIKI OLEH satu Pemilik"
      */

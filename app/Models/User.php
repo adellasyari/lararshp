@@ -41,6 +41,9 @@ class User extends Authenticatable
         'idrole', // Foreign key ke tabel role
     ];
 
+    // User model should use timestamps (created_at, updated_at)
+    public $timestamps = true;
+
     /**
      * 4. Relasi ke tabel Pemilik
      * (Satu User memiliki satu data Pemilik)
