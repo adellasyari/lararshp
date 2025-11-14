@@ -1,37 +1,70 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'RSHP') }}</title>
-    <style>
-        /* Minimal site layout styles (no Bootstrap/AdminLTE) */
-        body { font-family: Arial, Helvetica, sans-serif; margin:0; padding:0; background:#f5f7fa; color:#222; }
-        .site-header { display:flex; justify-content:space-between; align-items:center; padding:14px 24px; background:#fff; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
-        .site-header .brand { font-weight:700; color:#0b2d82; text-decoration:none; }
-        .site-header .nav { display:flex; gap:12px; }
-        .site-header .nav a { color:#0b2d82; text-decoration:none; font-weight:600; }
-        main { padding: 24px; max-width:1100px; margin: 0 auto; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSHP - Rumah Sakit Hewan Pendidikan</title>
+    
+    {{-- Menautkan file CSS global dan spesifik situs --}}
+    <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>
-    <header class="site-header">
-        <a class="brand" href="{{ url('/') }}">{{ config('app.name', 'RSHP') }}</a>
-        <nav class="nav">
-            @guest
-                @if (Route::has('login'))<a href="{{ route('login') }}">Login</a>@endif
-                @if (Route::has('register'))<a href="{{ route('register') }}">Register</a>@endif
-            @else
-                <a href="#">{{ Auth::user()->nama }}</a>
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
-            @endguest
-        </nav>
-    </header>
 
+    {{-- =============================================== --}}
+    {{--                BAGIAN NAVBAR                  --}}
+    {{-- =============================================== --}}
+    <nav class="site-nav">
+        <ul class="site-nav-list">
+            <li class="site-nav-item">
+                <a href="{{ route('site.home') }}" class="site-nav-link">Home</a>
+            </li>
+            <li class="site-nav-item">
+                <a href="{{ route('site.struktur_organisasi') }}" class="site-nav-link">Struktur Organisasi</a>
+            </li>
+            <li class="site-nav-item">
+                <a href="{{ route('site.layanan_umum') }}" class="site-nav-link">Layanan Umum</a>
+            </li>
+            <li class="site-nav-item">
+                <a href="{{ route('site.visi_misi') }}" class="site-nav-link">Visi Misi & Tujuan</a>
+            </li>
+            <li class="site-nav-item">
+                <a href="{{ route('site.berita') }}" class="site-nav-link">Berita Terbaru</a>
+            </li>
+            <li class="site-nav-item">
+                <a href="{{ route('login') }}" class="site-nav-link">Login</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="logo-container">
+        <img src="{{ asset('asset/img/LogoRSHP.webp')}}" alt="Gambar RSHP" class="logo-image">
+    </div>
+
+    {{-- =============================================== --}}
+    {{--         SLOT UNTUK KONTEN HALAMAN             --}}
+    {{-- =============================================== --}}
     <main>
         @yield('content')
     </main>
+
+    {{-- =============================================== --}}
+    {{--                BAGIAN FOOTER                  --}}
+    {{-- =============================================== --}}
+    <footer class="site-footer">
+        <div class="footer-heading">
+            Terima Kasih Telah Mengunjungi Rumah Sakit Hewan Pendidikan Universitas Airlangga
+        </div>
+        <div class="footer-subheading">
+            Bersama RSHP UNAIR, wujudkan kesehatan hewan yang lebih baik untuk masa depan yang cerah.
+        </div>
+        <div class="footer-copyright">
+            &copy; {{ date('Y') }} Rumah Sakit Hewan Pendidikan Universitas Airlangga. All rights reserved.
+        </div>
+    </footer>
+
+    {{-- <script src="{{ asset('js/app.js') }}"></script> --}}
+
 </body>
 </html>

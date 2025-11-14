@@ -1,11 +1,6 @@
 @extends('layouts.site')
 @section('content')
 
-<!-- Logo RSHP -->
-<div style="display: flex; justify-content: center; align-items: center; margin: 10px 0;">
-    <img src="/asset/LogoRSHP.webp" alt="Gambar RSHP" style="max-width: 50%; height: auto; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
-</div>
-
 <!-- Profi Rshp dan Vidio -->
 <div style="display: flex; justify-content: center; align-items: flex-start; gap: 36px; margin: 40px 0;">
     <!-- tabel kiri -->

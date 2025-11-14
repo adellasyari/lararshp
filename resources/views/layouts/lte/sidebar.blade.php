@@ -126,12 +126,6 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-circle"></i>
-                <p>Temu Dokter</p>
-              </a>
-            </li>
-            <li class="nav-item">
               <a href="{{ route('admin.rekam-medis.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-circle"></i>
                 <p>Rekam Medis</p>
@@ -141,30 +135,6 @@
               <a href="{{ route('admin.tindakan-terapi.index') }}" class="nav-link">
                 <i class="nav-icon bi bi-circle"></i>
                 <p>Tindakan Terapi</p>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-header">LAPORAN</li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon bi bi-bar-chart-fill"></i>
-            <p>
-              Laporan
-              <i class="nav-arrow bi bi-chevron-right"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-circle"></i>
-                <p>Laporan Kunjungan</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon bi bi-circle"></i>
-                <p>Laporan Tindakan</p>
               </a>
             </li>
           </ul>

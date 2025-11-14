@@ -5,23 +5,23 @@
     <h2 class="page-title">Layanan Umum</h2>
     <div class="card services-box">
         <div class="service-item">
-            <img src="{{ asset('asset/Hospital.jpg')}}" alt="Instalansi Rawat Inap" class="service-icon">
+            <img src="{{ asset('asset/img/Hospital.jpg')}}" alt="Instalansi Rawat Inap" class="service-icon">
             <div class="service-title">Instalansi Rawat Inap</div>
         </div>
         <div class="service-item">
-            <img src="{{ asset('asset/Farmasi.jpg')}}" alt="Farmasi" class="service-icon">
+            <img src="{{ asset('asset/img/Farmasi.jpg')}}" alt="Farmasi" class="service-icon">
             <div class="service-title">Farmasi</div>
         </div>
         <div class="service-item">
-            <img src="{{ asset('asset/Ambulance.jpg')}}" alt="Rawat Jalan" class="service-icon">
+            <img src="{{ asset('asset/img/Ambulance.jpg')}}" alt="Rawat Jalan" class="service-icon">
             <div class="service-title">Rawat Jalan</div>
         </div>
         <div class="service-item">
-            <img src="{{ asset('asset/HospitalBed.jpg')}}" alt="Bedah" class="service-icon">
+            <img src="{{ asset('asset/img/HospitalBed.jpg')}}" alt="Bedah" class="service-icon">
             <div class="service-title">Bedah</div>
         </div>
         <div class="service-item">
-            <img src="{{ asset('asset/Kimia.jpg')}}" alt="Ultrasonografi" class="service-icon">
+            <img src="{{ asset('asset/img/Kimia.jpg')}}" alt="Ultrasonografi" class="service-icon">
             <div class="service-title">Ultrasonografi</div>
         </div>
     </div>
