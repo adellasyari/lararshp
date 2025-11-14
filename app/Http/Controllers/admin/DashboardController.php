@@ -14,15 +14,37 @@ use App\Models\Pemilik;
 use App\Models\Pet;
 use App\Models\RekamMedis;
 use App\Models\TindakanTerapi;
+use App\Models\TemuDokter;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $role = session('user_role');
+        // Summary stats for dashboard
+        $stats = [
+            'users' => User::count(),
+            'pets' => Pet::count(),
+            'appointments' => TemuDokter::count(),
+            'records' => RekamMedis::count(),
+        ];
+
+        // Recent users (latest 6) - prefer `created_at` when available,
+        // otherwise fall back to ordering by the model primary key.
+        $userModel = new User();
+        $userTable = $userModel->getTable();
+        if (Schema::hasColumn($userTable, 'created_at')) {
+            $recentUsers = User::orderBy('created_at', 'desc')->limit(6)->get();
+        } else {
+            $recentUsers = User::orderBy($userModel->getKeyName(), 'desc')->limit(6)->get();
+        }
 
         return view('admin.dashboard', [
             'role' => $role,
+            'stats' => $stats,
+            'recentUsers' => $recentUsers,
+            // keep previous collections for modules that may need them
             'kategoris' => Kategori::all(),
             'kategoriKliniss' => KategoriKlinis::all(),
             'jenisHewans' => JenisHewan::all(),

@@ -1,25 +1,44 @@
-@extends('layouts.app')
-@section('title', 'Daftar Pet (Hewan Peliharaan)')
+@extends('layouts.lte.main')
+
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Daftar Pet (Hewan Peliharaan)</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Pemilik & Pet</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Pet</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4>Daftar Pet (Hewan Peliharaan)</h4>
-                        <div>
-                            <a href="{{ route('admin.pet.create') }}" class="btn btn-primary me-2"><i class="fas fa-plus"></i> Tambah Pet</a>
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Kembali ke Dashboard</a>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Tabel Data Pet</h3>
+                        <div class="card-tools">
+                            <a href="{{ route('admin.pet.create') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Tambah Pet</a>
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary btn-sm ms-2"><i class="bi bi-arrow-left"></i> Dashboard</a>
                         </div>
                     </div>
-
                     <div class="card-body">
-                        @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">{{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>No</th>
+                                    <th style="width:10px">#</th>
                                     <th>Nama Hewan</th>
                                     <th>Pemilik</th>
                                     <th>Jenis Hewan</th>
@@ -27,39 +46,46 @@
                                     <th>Tanggal Lahir</th>
                                     <th>Warna/Tanda</th>
                                     <th>Jenis Kelamin</th>
-                                    <th>Aksi</th>
+                                    <th style="width:150px">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($pet as $index => $item)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $item->nama }}</td>
-                                        <td>{{ $item->pemilik->user->nama ?? 'User Dihapus' }}</td>
-                                        <td>{{ $item->rasHewan->jenisHewan->nama_jenis_hewan ?? 'Jenis Dihapus' }}</td>
-                                        <td>{{ $item->rasHewan->nama_ras ?? $item->rasHewan->nama_ras_hewan ?? 'Ras Dihapus' }}</td>
-                                        <td>{{ $item->tanggal_lahir }}</td>
-                                        <td>{{ $item->warna_tanda }}</td>
-                                        <td>{{ $item->jenis_kelamin }}</td>
-                                        <td>
-                                            @php $key = method_exists($item, 'getKey') ? $item->getKey() : ($item->idpet ?? null); @endphp
-                                            @if(!empty($key))
-                                                <a href="{{ route('admin.pet.edit', ['id' => $key]) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
-
-                                                <form action="{{ route('admin.pet.destroy', ['id' => $key]) }}" method="POST" style="display:inline-block; margin-left:6px;" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                <tr class="align-middle">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $item->nama }}</td>
+                                    <td>{{ $item->pemilik->user->nama ?? 'User Dihapus' }}</td>
+                                    <td>{{ $item->rasHewan->jenisHewan->nama_jenis_hewan ?? 'Jenis Dihapus' }}</td>
+                                    <td>{{ $item->rasHewan->nama_ras ?? $item->rasHewan->nama_ras_hewan ?? 'Ras Dihapus' }}</td>
+                                    <td>{{ $item->tanggal_lahir }}</td>
+                                    <td>{{ $item->warna_tanda }}</td>
+                                    <td>{{ $item->jenis_kelamin }}</td>
+                                    <td>
+                                        @php $key = method_exists($item, 'getKey') ? $item->getKey() : ($item->idpet ?? null); @endphp
+                                        @if(!empty($key))
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('admin.pet.edit', ['id' => $key]) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                                <form action="{{ route('admin.pet.destroy', ['id' => $key]) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Hapus</button>
                                                 </form>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-                                        </td>
-                                    </tr>
+                                            </div>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="9" class="text-center">Data hewan masih kosong.</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        <div class="py-4">
+                                            <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+                                            <h5 class="text-muted">Data hewan masih kosong</h5>
+                                            <a href="{{ route('admin.pet.create') }}" class="btn btn-primary mt-2"><i class="bi bi-plus-circle"></i> Tambah Pet</a>
+                                        </div>
+                                    </td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -68,4 +94,19 @@
             </div>
         </div>
     </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+</script>
 @endsection

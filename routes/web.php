@@ -28,6 +28,24 @@ use App\Http\Controllers\Admin\RekamMedisController;
 
 Route::get('/cek-koneksi', [SiteController::class, 'cekKoneksi'])->name('site.cek-koneksi');
 
+// Dashboard route
+Route::get('/dashboard', function () {
+    return view('dashboard', [
+        'title' => 'Dashboard - RSHP',
+        'totalPemilik' => 150,
+        'totalPet' => 200,
+        'totalKunjungan' => 85,
+        'totalUser' => 12
+    ]);
+})->name('dashboard');
+
+// Admin Dashboard route
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard', [
+        'title' => 'Admin Dashboard - RSHP'
+    ]);
+})->name('admin.dashboard');
+
 // URL UTAMA (Root URL /)
 Route::get('/', [SiteController::class, 'home'])->name('site.home');
 

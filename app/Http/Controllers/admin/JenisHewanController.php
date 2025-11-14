@@ -10,11 +10,11 @@ class JenisHewanController extends Controller
 {
     public function index()
     {
-        // 2. Ambil semua data menggunakan Eloquent
-        // Metode ini sederhana dan mengambil semua kolom.
-        $jenisHewan = JenisHewan::all();
+        // Query Builder
+        $jenisHewan = \DB::table('jenis_hewan')
+            ->select('idjenis_hewan', 'nama_jenis_hewan')
+            ->get();
 
-        // 3. Kirim data ke view
         return view('admin.jenis-hewan.index', compact('jenisHewan'));
     }
 
@@ -109,9 +109,11 @@ class JenisHewanController extends Controller
     protected function createJenisHewan(array $data)
     {
         try {
-            return JenisHewan::create([
+            // Query Builder
+            $jenisHewan = \DB::table('jenis_hewan')->insert([
                 'nama_jenis_hewan' => $this->formatNamaJenisHewan($data['nama_jenis_hewan']),
             ]);
+            return $jenisHewan;
         } catch (\Exception $e) {
             throw new \Exception('Gagal menyimpan data: ' . $e->getMessage());
         }

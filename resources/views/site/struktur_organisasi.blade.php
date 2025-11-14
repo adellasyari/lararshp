@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.site')
 @section('content')
 
 <div id="struktur-organisasi" class="page-section">

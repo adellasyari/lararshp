@@ -1,21 +1,36 @@
-@extends('layouts.app')
-@section('title', 'Edit Rekam Medis')
-@section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card">
-                    <div class="card-header"><h4>Edit Rekam Medis</h4></div>
-                    <div class="card-body">
-                        @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
+@extends('layouts.lte.main')
 
-                        <form action="{{ route('admin.rekam-medis.update', $rekamMedis->getKey()) }}" method="POST">
-                            @csrf
-                            @method('PUT')
+@section('content')
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Edit Rekam Medis</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.rekam-medis.index') }}">Rekam Medis</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Ubah Rekam Medis</h3></div>
+                    <form action="{{ route('admin.rekam-medis.update', $rekamMedis->getKey()) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="card-body">
+                            @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
                             <div class="mb-3">
                                 <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal', optional($rekamMedis->created_at)->format('Y-m-d')) }}" required>
+                                <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal', optional($rekamMedis->created_at)->format('Y-m-d')) }}" required autofocus>
                                 @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
@@ -37,11 +52,9 @@
                                 @error('diagnosa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <!-- 'tindakan' and 'obat' removed per request; these columns are not in DB -->
-
                             <div class="mb-3">
                                 <label for="idpet" class="form-label">Pet <span class="text-danger">*</span></label>
-                                <select name="idpet" id="idpet" class="form-control @error('idpet') is-invalid @enderror" required>
+                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
                                     <option value="">-- Pilih Hewan --</option>
                                     @foreach($pets as $p)
                                         <option value="{{ $p->idpet }}" {{ old('idpet', $rekamMedis->idpet) == $p->idpet ? 'selected' : '' }}>{{ $p->nama }}</option>
@@ -52,7 +65,7 @@
 
                             <div class="mb-3">
                                 <label for="dokter_pemeriksa" class="form-label">Dokter Pemeriksa <span class="text-danger">*</span></label>
-                                <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-control @error('dokter_pemeriksa') is-invalid @enderror" required>
+                                <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror" required>
                                     <option value="">-- Pilih Dokter (Role User) --</option>
                                     @foreach($doctors as $d)
                                         <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa', $rekamMedis->dokter_pemeriksa) == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? ('Role: '.$d->role->idrole) }}</option>
@@ -60,15 +73,45 @@
                                 </select>
                                 @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ route('admin.rekam-medis.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
+                            <button type="submit" class="btn btn-primary ms-2">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ route('admin.rekam-medis.index') }}" class="btn btn-secondary">Kembali</a>
-                                <button type="submit" class="btn btn-primary">Update</button>
-                            </div>
-                        </form>
+            <div class="col-lg-4">
+                <div class="card card-info">
+                    <div class="card-header"><h3 class="card-title">Info</h3></div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-5">ID</dt>
+                            <dd class="col-sm-7">{{ $rekamMedis->getKey() }}</dd>
+
+                            <dt class="col-sm-5">Pet</dt>
+                            <dd class="col-sm-7">{{ $rekamMedis->pet->nama ?? '-' }}</dd>
+
+                            <dt class="col-sm-5">Dokter</dt>
+                            <dd class="col-sm-7">{{ $rekamMedis->dokter->nama ?? '-' }}</dd>
+
+                            <dt class="col-sm-5">Dibuat</dt>
+                            <dd class="col-sm-7">{{ optional($rekamMedis->created_at)->format('d M Y H:i') ?? '-' }}</dd>
+
+                            <dt class="col-sm-5">Terakhir diubah</dt>
+                            <dd class="col-sm-7">{{ optional($rekamMedis->updated_at)->format('d M Y H:i') ?? '-' }}</dd>
+                        </dl>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() { const first = document.querySelector('[autofocus]'); if(first) first.focus(); });
+</script>
 @endsection

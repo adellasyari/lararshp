@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.site')
 @section('content')
 
 <div id="layanan-umum" class="page-section">

@@ -12,10 +12,10 @@ class KategoriController extends Controller
     {
         // 2. Ambil semua data menggunakan Eloquent
         // Metode ini sederhana dan mengambil semua kolom.
-        $kategori = Kategori::all();
+        $kategoris = Kategori::all();
 
-        // 3. Kirim data ke view
-        return view('admin.kategori.index', compact('kategori'));
+        // 3. Kirim data (plural) ke view supaya sesuai dengan variabel di Blade
+        return view('admin.kategori.index', compact('kategoris'));
     }
 
     /**
