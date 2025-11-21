@@ -48,4 +48,9 @@ class Pemilik extends Model
     {
         return $this->hasMany(RekamMedis::class, 'idpemilik', 'idpemilik');
     }
+
+    public function temuDokters()
+    {
+        return $this->hasMany(TemuDokter::class, 'idpemilik', 'idpemilik');
+    }
 }

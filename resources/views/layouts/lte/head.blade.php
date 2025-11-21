@@ -45,6 +45,8 @@
     <!--end::Third Party Plugin(Bootstrap Icons)-->
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="{{ asset('asset/css/adminlte.css') }}" />
+    <!-- Custom Admin overrides (load after AdminLTE) -->
+    <link rel="stylesheet" href="{{ asset('asset/css/custom-admin.css') }}" />
     <!--end::Required Plugin(AdminLTE)-->
     <!-- apexcharts -->
     <link

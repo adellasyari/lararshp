@@ -63,8 +63,10 @@ class TindakanTerapiController extends Controller
         $validated = $this->validateTindakan($request, $tindakanTerapi->getKey());
 
         try {
+            // Truncate kode to DB width to be safe
+            $kode = isset($validated['kode']) ? substr(trim($validated['kode']), 0, 5) : null;
             $tindakanTerapi->update([
-                'kode' => $validated['kode'],
+                'kode' => $kode,
                 'deskripsi_tindakan_terapi' => $validated['deskripsi_tindakan_terapi'],
                 'idkategori' => $validated['idkategori'],
                 'idkategori_klinis' => $validated['idkategori_klinis'] ?? null,
@@ -91,12 +93,14 @@ class TindakanTerapiController extends Controller
     protected function validateTindakan(Request $request, $id = null)
     {
         return $request->validate([
-            'kode' => ['required','string','max:50'],
+            // Database `kode` column is varchar(5) in this project; restrict input
+            'kode' => ['required','string','max:5'],
             'deskripsi_tindakan_terapi' => ['required','string','max:1000'],
             'idkategori' => ['required','exists:kategori,idkategori'],
             'idkategori_klinis' => ['nullable','exists:kategori_klinis,idkategori_klinis'],
         ],[
             'kode.required' => 'Kode tindakan wajib diisi.',
+            'kode.max' => 'Kode tindakan maksimal 5 karakter sesuai skema database.',
             'deskripsi_tindakan_terapi.required' => 'Deskripsi tindakan wajib diisi.',
             'idkategori.required' => 'Kategori wajib dipilih.',
         ]);
@@ -107,8 +111,10 @@ class TindakanTerapiController extends Controller
      */
     protected function createTindakan(array $data)
     {
+        // Ensure kode fits DB column (truncate if necessary) to prevent SQL errors
+        $kode = isset($data['kode']) ? substr(trim($data['kode']), 0, 5) : null;
         return TindakanTerapi::create([
-            'kode' => $data['kode'],
+            'kode' => $kode,
             'deskripsi_tindakan_terapi' => $data['deskripsi_tindakan_terapi'],
             'idkategori' => $data['idkategori'],
             'idkategori_klinis' => $data['idkategori_klinis'] ?? null,

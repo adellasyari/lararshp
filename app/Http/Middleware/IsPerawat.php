@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 class IsPerawat
@@ -18,7 +19,8 @@ class IsPerawat
     {
         // Cek apakah user sudah login
         if (!Auth::check()) {
-            return redirect('/home')->withErrors(['error' => 'Anda harus login terlebih dahulu.']);
+            $home = Route::has('site.home') ? route('site.home') : url('/');
+            return redirect($home)->withErrors(['error' => 'Anda harus login terlebih dahulu.']);
         }
 
         // Ambil user yang sedang login
@@ -28,7 +30,8 @@ class IsPerawat
         $hasRole = $user->roles()->where('nama_role', 'Perawat')->wherePivot('status', 1)->exists();
 
         if (!$hasRole) {
-            return redirect('/home')->withErrors(['error' => 'Akses ditolak. Anda tidak memiliki hak akses sebagai Perawat.']);
+            $home = Route::has('site.home') ? route('site.home') : url('/');
+            return redirect($home)->withErrors(['error' => 'Akses ditolak. Anda tidak memiliki hak akses sebagai Perawat.']);
         }
 
         return $next($request);

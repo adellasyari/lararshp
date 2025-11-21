@@ -10,15 +10,16 @@ class TemuDokter extends Model
     use HasFactory;
 
     protected $table = 'temu_dokter';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'idreservasi_dokter';
     public $incrementing = true;
     protected $keyType = 'int';
 
     protected $fillable = [
         'idpet',
         'idpemilik',
-        'tanggal',
-        'waktu',
+        'waktu_daftar',
+        'no_urut',
+        'idrole_user',
         'status',
     ];
 
@@ -33,6 +34,12 @@ class TemuDokter extends Model
     public function pemilik()
     {
         return $this->belongsTo(Pemilik::class, 'idpemilik', 'idpemilik');
+    }
+
+    /** Relasi ke role_user (dokter) */
+    public function dokter()
+    {
+        return $this->belongsTo(RoleUser::class, 'idrole_user', 'idrole_user');
     }
 
     public function rekamMedis()

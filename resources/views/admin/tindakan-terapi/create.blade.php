@@ -32,7 +32,7 @@
 
                             <div class="mb-3">
                                 <label for="kode" class="form-label">Kode <span class="text-danger">*</span></label>
-                                <input type="text" name="kode" id="kode" class="form-control @error('kode') is-invalid @enderror" value="{{ old('kode') }}" required autofocus>
+                                <input type="text" name="kode" id="kode" maxlength="5" class="form-control @error('kode') is-invalid @enderror" value="{{ old('kode') }}" required autofocus>
                                 @error('kode')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 

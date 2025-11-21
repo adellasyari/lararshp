@@ -39,6 +39,7 @@
 
                             <div class="mb-3">
                                 <label for="idpemilik" class="form-label">Pemilik <span class="text-danger">*</span></label>
+                                <input type="text" id="pemilikSearch" class="form-control mb-2" placeholder="Cari pemilik (nama atau email)...">
                                 <select name="idpemilik" id="idpemilik" class="form-select @error('idpemilik') is-invalid @enderror" required>
                                     <option value="">-- Pilih Pemilik --</option>
                                     @foreach($pemilik as $p)
@@ -96,6 +97,26 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const first = document.querySelector('[autofocus]'); if(first) first.focus();
+
+    // Membuat daftar pemilik untuk pencarian
+    const owners = @json($pemilik->map(function($p){ return ['id'=>$p->idpemilik, 'label'=> ($p->user->nama ?? 'User Dihapus')]; }));
+    const select = document.getElementById('idpemilik');
+    const input = document.getElementById('pemilikSearch');
+
+    if (select && input) {
+        const render = function(filter) {
+            const current = select.value;
+            select.innerHTML = '';
+            const ph = document.createElement('option'); ph.value = ''; ph.textContent = '-- Pilih Pemilik --'; select.appendChild(ph);
+            const q = (filter||'').trim().toLowerCase();
+            const list = owners.filter(o => { if(!q) return true; return o.label.toLowerCase().includes(q); });
+            list.forEach(o => {
+                const opt = document.createElement('option'); opt.value = o.id; opt.textContent = o.label; if(String(o.id)===String(current)) opt.selected = true; select.appendChild(opt);
+            });
+        };
+        render('');
+        input.addEventListener('input', function(e){ render(e.target.value); });
+    }
 });
 </script>
 @endsection

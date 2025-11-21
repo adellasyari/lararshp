@@ -390,3 +390,23 @@
 .org-person-title-l2 {
     font-size: 17px;
 }
+
+/* Override warna sidebar (AdminLTE / Bootstrap bg classes) */
+.app-sidebar,
+.app-sidebar.bg-body-secondary,
+.app-sidebar[data-bs-theme="dark"] {
+    background-color: #0B2D82 !important;
+    color: #ffffff !important;
+}
+
+.app-sidebar .brand-link,
+.app-sidebar .sidebar-brand,
+.app-sidebar .nav-link,
+.app-sidebar .sidebar-menu a,
+.app-sidebar .sidebar-wrapper {
+    color: #ffffff !important;
+}
+
+.app-sidebar .nav-link:hover {
+    color: #FFD600 !important;
+}

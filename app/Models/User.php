@@ -11,6 +11,8 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Pemilik;
 use App\Models\Role;
 use App\Models\RoleUser;
+use App\Models\Dokter;
+use App\Models\Perawat;
 
 class User extends Authenticatable
 {
@@ -41,8 +43,9 @@ class User extends Authenticatable
         'idrole', // Foreign key ke tabel role
     ];
 
-    // User model should use timestamps (created_at, updated_at)
-    public $timestamps = true;
+    // The `user` table in this project does not have Laravel timestamp columns
+    // so disable automatic timestamps to avoid inserting `created_at`/`updated_at`.
+    public $timestamps = false;
 
     /**
      * 4. Relasi ke tabel Pemilik
@@ -52,6 +55,22 @@ class User extends Authenticatable
     {
         // Parameter: (ModelTujuan, foreign_key, local_key)
         return $this->hasOne(Pemilik::class, 'iduser', 'iduser');
+    }
+
+    /**
+     * Relasi ke data Dokter (jika user adalah dokter)
+     */
+    public function dokter()
+    {
+        return $this->hasOne(Dokter::class, 'id_user', 'iduser');
+    }
+
+    /**
+     * Relasi ke data Perawat (jika user adalah perawat)
+     */
+    public function perawat()
+    {
+        return $this->hasOne(Perawat::class, 'id_user', 'iduser');
     }
 
     public function roles()

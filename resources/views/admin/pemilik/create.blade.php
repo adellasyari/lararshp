@@ -33,6 +33,7 @@
 
                             <div class="mb-3">
                                 <label for="iduser" class="form-label">User <span class="text-danger">*</span></label>
+                                <input type="text" id="userSearch" class="form-control mb-2" placeholder="Cari user (nama atau email)...">
                                 <select name="iduser" id="iduser" class="form-select @error('iduser') is-invalid @enderror" required>
                                     <option value="">-- Pilih User --</option>
                                     @foreach($users as $user)
@@ -66,10 +67,49 @@
 </div>
 @endsection
 
-@section('scripts')
+
+@section('scripts') 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const first = document.querySelector('[autofocus]'); if(first) first.focus();
+    
+    // Membuat daftar user untuk pencarian
+    const users = @json($users->map(function($u){ return ['id'=>$u->iduser, 'label'=>$u->nama . ' (' . $u->email . ')']; }));
+    const select = document.getElementById('iduser');
+    const input = document.getElementById('userSearch');
+
+    if (!select || !input) return;
+
+    const renderOptions = function(filter) {
+        const current = select.value;
+        // clear existing (keep the placeholder first option)
+        select.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '-- Pilih User --';
+        select.appendChild(placeholder);
+
+        const q = (filter||'').trim().toLowerCase();
+        const list = users.filter(u => {
+            if (!q) return true;
+            return u.label.toLowerCase().includes(q);
+        });
+
+        list.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = u.label;
+            if (String(u.id) === String(current)) opt.selected = true;
+            select.appendChild(opt);
+        });
+    };
+
+    // initialize
+    renderOptions('');
+
+    input.addEventListener('input', function(e) {
+        renderOptions(e.target.value);
+    });
 });
 </script>
 @endsection

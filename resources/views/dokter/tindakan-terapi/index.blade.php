@@ -1,39 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.lte.main')
+
+@section('title','Tindakan Terapi (Dinonaktifkan untuk Dokter)')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Daftar Tindakan Terapi - Dokter</h4>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nama Tindakan</th>
-                                <th>Kategori</th>
-                                <th>Kategori Klinis</th>
-                                <th>Deskripsi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($tindakanTerapis as $tindakan)
-                            <tr>
-                                <td>{{ $tindakan->idkode_tindakan_terapi }}</td>
-                                <td>{{ $tindakan->deskripsi_tindakan_terapi }}</td>
-                                <td>{{ $tindakan->kategori->nama_kategori ?? 'N/A' }}</td>
-                                <td>{{ $tindakan->kategoriKlinis->nama_kategori_klinis ?? 'N/A' }}</td>
-                                <td>{{ $tindakan->deskripsi }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="alert alert-info">Manajemen Tindakan Terapi dinonaktifkan untuk role Dokter. Master data Tindakan Terapi dikelola oleh Administrator. Dokter hanya bisa memilih tindakan saat membuat pemeriksaan (Rekam Medis).</div>
+        <a href="{{ route('dokter.rekam-medis.index') }}" class="btn btn-secondary">Kembali ke Pemeriksaan Pasien</a>
     </div>
 </div>
+
 @endsection
+
