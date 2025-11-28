@@ -54,27 +54,7 @@
                                 @error('diagnosa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="idpet" class="form-label">Pet <span class="text-danger">*</span></label>
-                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
-                                    <option value="">-- Pilih Hewan --</option>
-                                    @foreach($pets as $p)
-                                        <option value="{{ $p->idpet }}" {{ old('idpet', $rekamMedis->idpet) == $p->idpet ? 'selected' : '' }}>{{ $p->nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="dokter_pemeriksa" class="form-label">Dokter Pemeriksa</label>
-                                <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror">
-                                    <option value="">-- Pilih Dokter --</option>
-                                    @foreach($dokters as $d)
-                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa', $rekamMedis->dokter_pemeriksa) == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? $d->idrole_user }}</option>
-                                    @endforeach
-                                </select>
-                                @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            {{-- Pet and Dokter Pemeriksa fields removed per request --}}
                         </div>
                         <div class="card-footer">
                             <a href="{{ route('perawat.rekam-medis.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>

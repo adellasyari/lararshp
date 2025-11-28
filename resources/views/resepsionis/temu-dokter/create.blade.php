@@ -53,18 +53,7 @@
                                 @error('idrole_user')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal') }}" required>
-                                    @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="waktu" class="form-label">Waktu <span class="text-danger">*</span></label>
-                                    <input type="time" name="waktu" id="waktu" class="form-control @error('waktu') is-invalid @enderror" value="{{ old('waktu') }}" required>
-                                    @error('waktu')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                </div>
-                            </div>
+                            <div class="alert alert-info">Waktu pendaftaran akan otomatis diisi saat Anda menekan <strong>Daftarkan</strong> (waktu server saat ini).</div>
                         </div>
                         <div class="card-footer">
                             <a href="{{ route('resepsionis.temu-dokter.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Batal</a>

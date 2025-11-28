@@ -24,6 +24,8 @@
                     <div class="card-header"><h3 class="card-title">Form Tambah Rekam Medis</h3></div>
                     <form action="{{ route('perawat.rekam-medis.store') }}" method="POST">
                         @csrf
+                        {{-- default verification status: 0 (not verified) --}}
+                        <input type="hidden" name="status_verifikasi" value="0">
                         <div class="card-body">
                             @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
@@ -32,6 +34,29 @@
                                 <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal', isset($selectedPet) ? now()->format('Y-m-d') : old('tanggal')) }}" required autofocus>
                                 @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
+
+                            {{-- Jika route dipanggil dengan ?idpet=..., gunakan hidden input untuk idpet agar validasi terpenuhi --}}
+                            @if(!empty($selectedPet))
+                                <input type="hidden" name="idpet" value="{{ $selectedPet }}">
+                                <div class="mb-3">
+                                    <label class="form-label">Hewan</label>
+                                    @php $pet = \App\Models\Pet::with('pemilik.user')->find($selectedPet); @endphp
+                                    <div class="form-control-plaintext">{{ $pet->nama ?? 'Terpilih' }} @if($pet) - {{ optional($pet->pemilik->user)->nama ?? '' }}@endif</div>
+                                </div>
+                            @else
+                                <div class="mb-3">
+                                    <label for="idpet" class="form-label">Pilih Hewan <span class="text-danger">*</span></label>
+                                    <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
+                                        <option value="">-- Pilih Hewan --</option>
+                                        @foreach($pets as $p)
+                                            <option value="{{ $p->idpet }}" @if(old('idpet') == $p->idpet) selected @endif>{{ $p->nama }} - {{ optional($p->pemilik->user)->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                            @endif
+
+                            {{-- Dokter pemeriksa dan tindakan terapi dihapus sesuai permintaan --}}
 
                             <div class="mb-3">
                                 <label for="anamnesa" class="form-label">Anamnesa <span class="text-danger">*</span></label>
@@ -51,31 +76,11 @@
                                 @error('diagnosa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="idpet" class="form-label">Pet <span class="text-danger">*</span></label>
-                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
-                                    <option value="">-- Pilih Hewan --</option>
-                                    @foreach($pets as $p)
-                                        <option value="{{ $p->idpet }}" {{ (isset($selectedPet) && $selectedPet == $p->idpet) || old('idpet') == $p->idpet ? 'selected' : '' }}>{{ $p->nama }}{{ optional($p->pemilik)->nama ? ' ('.optional($p->pemilik)->nama.')' : '' }}</option>
-                                    @endforeach
-                                </select>
-                                @error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="dokter_pemeriksa" class="form-label">Dokter Pemeriksa (opsional)</label>
-                                <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror">
-                                    <option value="">-- Pilih Dokter --</option>
-                                    @foreach($dokters as $d)
-                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa') == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? $d->idrole_user }}</option>
-                                    @endforeach
-                                </select>
-                                @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            {{-- Pet and Dokter Pemeriksa fields removed per request --}}
                         </div>
                         <div class="card-footer">
                             <a href="{{ route('perawat.rekam-medis.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
-                            <button type="submit" class="btn btn-success ms-2">Simpan</button>
+                            <button id="btn-submit" type="submit" class="btn btn-success ms-2">Simpan</button>
                         </div>
                     </form>
                 </div>
@@ -87,6 +92,23 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() { const first = document.querySelector('[autofocus]'); if(first) first.focus(); });
+document.addEventListener('DOMContentLoaded', function() {
+    const first = document.querySelector('[autofocus]'); if(first) first.focus();
+
+    // Prevent double-submit by disabling the submit button on first click
+    const form = document.querySelector('form[action="{{ route('perawat.rekam-medis.store') }}"]');
+    const btn = document.getElementById('btn-submit');
+    if (form && btn) {
+        form.addEventListener('submit', function(e){
+            // If the button is already disabled, prevent submission
+            if (btn.disabled) {
+                e.preventDefault();
+                return false;
+            }
+            btn.disabled = true;
+            btn.textContent = 'Menyimpan...';
+        });
+    }
+});
 </script>
 @endsection

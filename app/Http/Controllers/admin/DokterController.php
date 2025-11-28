@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Dokter;
+use App\Models\Pemilik;
+use App\Models\Pet;
+use App\Models\RekamMedis;
+use App\Models\TemuDokter;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 // no Hash needed: admin no longer creates/edits user password here
 
 class DokterController extends Controller
@@ -46,8 +53,31 @@ class DokterController extends Controller
             'jenis_kelamin' => 'nullable|string|max:10',
         ]);
 
+        // Perform the insert inside a DB transaction and log errors for diagnosis
+        \Illuminate\Support\Facades\Log::info('DokterController@store called', ['id_user' => $request->id_user]);
+        DB::beginTransaction();
         try {
-            Dokter::create([
+            // Ensure the application user exists
+            $user = User::find($request->id_user);
+            if (!$user) {
+                return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `user`.');
+            }
+
+            // Ensure legacy `users` table has matching id for FK constraints
+            $existsInLegacy = DB::table('users')->where('id', $user->iduser)->exists();
+            if (! $existsInLegacy) {
+                DB::table('users')->insert([
+                    'id' => $user->iduser,
+                    'name' => $user->nama,
+                    'email' => $user->email,
+                    'password' => Hash::make(Str::random(32)),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                \Illuminate\Support\Facades\Log::info('Inserted legacy users row for FK', ['id' => $user->iduser]);
+            }
+
+            $dokter = Dokter::create([
                 'id_dokter' => $request->id_user, // PK manual
                 'id_user' => $request->id_user,
                 'alamat' => $request->alamat,
@@ -55,7 +85,12 @@ class DokterController extends Controller
                 'bidang_dokter' => $request->bidang_dokter,
                 'jenis_kelamin' => $request->jenis_kelamin,
             ]);
+
+            DB::commit();
+            \Illuminate\Support\Facades\Log::info('Dokter created', ['id_dokter' => $dokter->id_dokter ?? null]);
         } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Failed to create Dokter', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal menambah dokter: '.$e->getMessage());
         }
 
@@ -109,8 +144,68 @@ class DokterController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
 
-        return redirect()->route('admin.dokter.index')->with('success', 'Dokter dihapus.');
+        // safety: prevent deleting currently authenticated user
+        if (auth()->check() && auth()->id() == $user->iduser) {
+            return redirect()->route('admin.dokter.index')->with('error', 'Tidak bisa menghapus akun sendiri.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1) Remove rekam_medis and its details that reference this user's role_user ids
+            $roleUserIds = \App\Models\RoleUser::where('iduser', $user->iduser)->pluck('idrole_user');
+            if ($roleUserIds->isNotEmpty()) {
+                // Find rekam_medis referencing these role_user ids as dokter_pemeriksa
+                $rekamList = \App\Models\RekamMedis::whereIn('dokter_pemeriksa', $roleUserIds)->get();
+                foreach ($rekamList as $rekam) {
+                    // delete detail_rekam_medis
+                    DB::table('detail_rekam_medis')->where('idrekam_medis', $rekam->idrekam_medis)->delete();
+                    // delete rekam_medis
+                    $rekam->delete();
+                }
+
+                // delete temu_dokter rows referencing role_user
+                \App\Models\TemuDokter::whereIn('idrole_user', $roleUserIds)->delete();
+
+                // finally delete role_user rows for this user
+                DB::table('role_user')->where('iduser', $user->iduser)->delete();
+            }
+
+            // 2) delete dokter record (if exists)
+            \App\Models\Dokter::where('id_user', $user->iduser)->delete();
+
+            // 3) If user is also a Pemilik, delete their pemilik record and related pets/rekam_medis
+            $pemilik = Pemilik::where('iduser', $user->iduser)->first();
+            if ($pemilik) {
+                $pets = Pet::where('idpemilik', $pemilik->idpemilik)->get();
+                foreach ($pets as $pet) {
+                    // delete detail_rekam_medis -> rekam_medis
+                    $rekams = RekamMedis::where('idpet', $pet->idpet)->get();
+                    foreach ($rekams as $r) {
+                        DB::table('detail_rekam_medis')->where('idrekam_medis', $r->idrekam_medis)->delete();
+                        $r->delete();
+                    }
+
+                    // delete temu_dokter rows for this pet
+                    TemuDokter::where('idpet', $pet->idpet)->delete();
+
+                    // delete pet
+                    $pet->delete();
+                }
+
+                // delete pemilik
+                $pemilik->delete();
+            }
+
+            // 3) delete the user
+            $user->delete();
+
+            DB::commit();
+            return redirect()->route('admin.dokter.index')->with('success', 'Dokter dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Failed to delete dokter user', ['iduser' => $user->iduser, 'error' => $e->getMessage()]);
+            return redirect()->route('admin.dokter.index')->with('error', 'Gagal menghapus dokter: ' . $e->getMessage());
+        }
     }
 }

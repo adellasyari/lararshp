@@ -32,21 +32,19 @@
                             @endif
 
                             <div class="mb-3">
-                                <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama') }}" required autofocus>
-                                @error('nama') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
-                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                                <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
-                                @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label for="id_user" class="form-label">Pilih User <span class="text-danger">*</span></label>
+                                <div class="mb-2">
+                                    <input type="text" id="id_user_search" class="form-control" placeholder="Cari user...">
+                                </div>
+                                <select name="id_user" id="id_user" class="form-select @error('id_user') is-invalid @enderror" required>
+                                    <option value="">-- Pilih User --</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->iduser }}" {{ old('id_user') == $user->iduser ? 'selected' : '' }}>
+                                            {{ $user->nama }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('id_user') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <hr>
                             <div class="mb-3">
@@ -77,6 +75,28 @@
                                 @error('jenis_kelamin') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
+                        <script> //untuk fitur search pada select user
+                            document.addEventListener('DOMContentLoaded', function () {
+                                try {
+                                    var search = document.getElementById('id_user_search');
+                                    var select = document.getElementById('id_user');
+                                    if (!search || !select) return;
+                                    search.addEventListener('input', function () {
+                                        var filter = this.value.toLowerCase();
+                                        Array.from(select.options).forEach(function (opt) {
+                                            if (!opt.value) { opt.hidden = false; return; }
+                                            var matches = opt.text.toLowerCase().includes(filter);
+                                            opt.hidden = !matches;
+                                        });
+                                        if (select.selectedIndex >= 0 && select.options[select.selectedIndex].hidden) {
+                                            select.value = '';
+                                        }
+                                    });
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            });
+                        </script>
                         <div class="card-footer">
                             <a href="{{ route('admin.perawat.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Batal</a>
                             <button type="submit" class="btn btn-success ms-2"><i class="bi bi-save"></i> Simpan</button>

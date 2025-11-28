@@ -21,6 +21,9 @@ class Perawat extends Model
     /** Tipe primary key (ubah ke 'string' jika UUID) */
     protected $keyType = 'int';
 
+    /** Disable Eloquent timestamps (table does not have created_at/updated_at) */
+    public $timestamps = false;
+
     /** Mass assignable */
     protected $fillable = [
         'alamat',

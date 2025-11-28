@@ -16,7 +16,6 @@ class TemuDokter extends Model
 
     protected $fillable = [
         'idpet',
-        'idpemilik',
         'waktu_daftar',
         'no_urut',
         'idrole_user',
@@ -33,7 +32,8 @@ class TemuDokter extends Model
 
     public function pemilik()
     {
-        return $this->belongsTo(Pemilik::class, 'idpemilik', 'idpemilik');
+        // `temu_dokter` table has no `idpemilik` column in this schema — do not define this relation.
+        return null;
     }
 
     /** Relasi ke role_user (dokter) */
@@ -42,8 +42,32 @@ class TemuDokter extends Model
         return $this->belongsTo(RoleUser::class, 'idrole_user', 'idrole_user');
     }
 
-    public function rekamMedis()
+    // relation to RekamMedis omitted because temu_dokter table has no idrekam_medis column
+
+    // Status constants matching database values (two-state workflow)
+    const STATUS_MENUNGGU = '0';
+    const STATUS_DIPERIKSA = '1';
+
+    /**
+     * Accessor: human readable status label.
+     * Map stored status codes to friendly strings used in the UI.
+     * - 0 or '0' => "Tunggu"
+     * - 1 or '1' => "Diperiksa"
+     * - null or empty => "Tunggu" (default)
+     */
+    public function getStatusLabelAttribute()
     {
-        return $this->belongsTo(RekamMedis::class, 'idrekam_medis', 'idrekam_medis');
+        $s = $this->attributes['status'] ?? null;
+        // default to Menunggu
+        if ($s === null || $s === '') {
+            return 'Menunggu';
+        }
+        if ((string)$s === self::STATUS_DIPERIKSA) {
+            return 'Diperiksa';
+        }
+        if ((string)$s === self::STATUS_MENUNGGU) {
+            return 'Menunggu';
+        }
+        return (string) $s;
     }
 }

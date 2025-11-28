@@ -213,6 +213,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('isDokter')->group(function () {
         Route::get('/dokter/dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dokter.dashboard');
         Route::resource('/dokter/rekam-medis', App\Http\Controllers\Dokter\RekamMedisController::class, ['names' => 'dokter.rekam-medis']);
+        // route helper: periksa — create-or-open last rekam medis then show (dokter only adds tindakan)
+        Route::get('/dokter/rekam-medis/periksa/{idpet}', [App\Http\Controllers\Dokter\RekamMedisController::class, 'periksa'])->name('dokter.rekam-medis.periksa');
         // Dokter hanya memilih tindakan; manajemen master ditangani oleh Admin
     });
 

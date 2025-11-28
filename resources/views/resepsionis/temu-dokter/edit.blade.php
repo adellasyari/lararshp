@@ -70,8 +70,8 @@
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select name="status" id="status" class="form-select">
-                                    <option value="0" {{ old('status', $temu->status) == 0 ? 'selected' : '' }}>Pending</option>
-                                    <option value="1" {{ old('status', $temu->status) == 1 ? 'selected' : '' }}>Selesai</option>
+                                    <option value="0" {{ old('status', $temu->status) == 0 ? 'selected' : '' }}>tunggu</option>
+                                    <option value="1" {{ old('status', $temu->status) == 1 ? 'selected' : '' }}>di periksa</option>
                                 </select>
                             </div>
                         </div>

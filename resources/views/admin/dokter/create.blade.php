@@ -33,6 +33,9 @@
 
                             <div class="mb-3">
                                 <label for="id_user" class="form-label">Pilih User <span class="text-danger">*</span></label>
+                                <div class="mb-2">
+                                    <input type="text" id="id_user_search" class="form-control" placeholder="Cari user...">
+                                </div>
                                 <select name="id_user" id="id_user" class="form-select @error('id_user') is-invalid @enderror" required>
                                     <option value="">-- Pilih User --</option>
                                     @foreach($users as $user)
@@ -74,6 +77,30 @@
 
                             <!-- Email dan password dihilangkan, karena user sudah ada -->
                         </div>
+                        <script>n//untuk fitur search pada select user
+                            document.addEventListener('DOMContentLoaded', function () {
+                                try {
+                                    var search = document.getElementById('id_user_search');
+                                    var select = document.getElementById('id_user');
+                                    if (!search || !select) return;
+                                    search.addEventListener('input', function () {
+                                        var filter = this.value.toLowerCase();
+                                        Array.from(select.options).forEach(function (opt) {
+                                            // keep the placeholder option visible
+                                            if (!opt.value) { opt.hidden = false; return; }
+                                            var matches = opt.text.toLowerCase().includes(filter);
+                                            opt.hidden = !matches;
+                                        });
+                                        // if selected option is hidden, clear selection
+                                        if (select.selectedIndex >= 0 && select.options[select.selectedIndex].hidden) {
+                                            select.value = '';
+                                        }
+                                    });
+                                } catch (e) {
+                                    console.error(e);
+                                }
+                            });
+                        </script>
                         <div class="card-footer">
                             <a href="{{ route('admin.dokter.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Batal</a>
                             <button type="submit" class="btn btn-success ms-2"><i class="bi bi-save"></i> Simpan</button>

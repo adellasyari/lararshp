@@ -30,32 +30,10 @@
                         <div class="card-body">
                             @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
-                            <div class="mb-3">
-                                <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal', optional($rekamMedis->created_at)->format('Y-m-d')) }}" required autofocus>
-                                @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            <p class="text-muted">Dokter hanya dapat menambahkan atau mengubah <strong>Tindakan Terapi</strong> dan <strong>Detail</strong>. Informasi lain bersifat read-only.</p>
 
                             <div class="mb-3">
-                                <label for="anamnesa" class="form-label">Anamnesa <span class="text-danger">*</span></label>
-                                <textarea name="anamnesa" id="anamnesa" class="form-control @error('anamnesa') is-invalid @enderror" required>{{ old('anamnesa', $rekamMedis->anamnesa) }}</textarea>
-                                @error('anamnesa')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="temuan_klinis" class="form-label">Temuan Klinis</label>
-                                <textarea name="temuan_klinis" id="temuan_klinis" class="form-control @error('temuan_klinis') is-invalid @enderror">{{ old('temuan_klinis', $rekamMedis->temuan_klinis) }}</textarea>
-                                @error('temuan_klinis')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="diagnosa" class="form-label">Diagnosa</label>
-                                <textarea name="diagnosa" id="diagnosa" class="form-control @error('diagnosa') is-invalid @enderror">{{ old('diagnosa', $rekamMedis->diagnosa) }}</textarea>
-                                @error('diagnosa')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="idkode_tindakan_terapi" class="form-label">Tindakan Terapi (opsional)</label>
+                                <label for="idkode_tindakan_terapi" class="form-label">Tindakan Terapi <span class="text-danger">(opsional)</span></label>
                                 <select name="idkode_tindakan_terapi" id="idkode_tindakan_terapi" class="form-select @error('idkode_tindakan_terapi') is-invalid @enderror">
                                     <option value="">-- Pilih Tindakan --</option>
                                     @if(isset($tindakanTerapis) && $tindakanTerapis->count())
@@ -68,30 +46,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="idpet" class="form-label">Pet <span class="text-danger">*</span></label>
-                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
-                                    <option value="">-- Pilih Hewan --</option>
-                                    @foreach($pets as $p)
-                                        <option value="{{ $p->idpet }}" {{ old('idpet', $rekamMedis->idpet) == $p->idpet ? 'selected' : '' }}>{{ $p->nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="dokter_pemeriksa" class="form-label">Dokter Pemeriksa</label>
-                                <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror">
-                                    <option value="">-- Pilih Dokter --</option>
-                                    @foreach($dokters as $d)
-                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa', $rekamMedis->dokter_pemeriksa) == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? $d->idrole_user }}</option>
-                                    @endforeach
-                                </select>
-                                @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label for="detail" class="form-label">Detail Tindakan</label>
+                                <textarea name="detail" id="detail" class="form-control @error('detail') is-invalid @enderror" rows="4">{{ old('detail') }}</textarea>
+                                @error('detail')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="card-footer">
                             <a href="{{ route('dokter.rekam-medis.index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
-                            <button type="submit" class="btn btn-primary ms-2">Update</button>
+                            <button type="submit" class="btn btn-primary ms-2">Simpan Tindakan</button>
                         </div>
                     </form>
                 </div>

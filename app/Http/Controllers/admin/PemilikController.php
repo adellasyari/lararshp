@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 // PASTIKAN INI MEMANGGIL MODEL YANG BENAR
 use App\Models\Pemilik; 
 use App\Models\User;
+use App\Models\Pet;
+use App\Models\RekamMedis;
+use App\Models\TemuDokter;
+use Illuminate\Support\Facades\DB;
 
 class PemilikController extends Controller
 {
@@ -103,10 +107,32 @@ class PemilikController extends Controller
     {
         $pemilik = Pemilik::findOrFail($id);
 
+        DB::beginTransaction();
         try {
+            // delete pets and their dependent records first
+            $pets = Pet::where('idpemilik', $pemilik->idpemilik)->get();
+            foreach ($pets as $pet) {
+                // delete detail_rekam_medis linked to rekam_medis of this pet
+                $rekams = RekamMedis::where('idpet', $pet->idpet)->get();
+                foreach ($rekams as $rekam) {
+                    DB::table('detail_rekam_medis')->where('idrekam_medis', $rekam->idrekam_medis)->delete();
+                    $rekam->delete();
+                }
+
+                // delete temu_dokter for this pet
+                TemuDokter::where('idpet', $pet->idpet)->delete();
+
+                // delete pet
+                $pet->delete();
+            }
+
+            // finally delete pemilik
             $pemilik->delete();
+
+            DB::commit();
             return redirect()->route('admin.pemilik.index')->with('success', 'Data pemilik berhasil dihapus.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
     }

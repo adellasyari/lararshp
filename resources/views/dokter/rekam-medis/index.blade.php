@@ -56,16 +56,13 @@
                                     <td>{{ optional($pet->pemilik)->nama ?? optional(optional($pet->pemilik)->user)->nama ?? '-' }}</td>
                                     <td>{{ optional($pet->pemilik)->no_wa ?? '-' }}</td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('dokter.rekam-medis.create') }}?idpet={{ $pet->idpet }}" class="btn btn-sm btn-primary"><i class="bi bi-person-check"></i> Periksa</a>
-                                            @php $last = $pet->rekamMedis()->orderBy('created_at','desc')->first(); @endphp
-                                            @if($last)
-                                                <a href="{{ route('dokter.rekam-medis.show', $last) }}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
-                                                <a href="{{ route('dokter.rekam-medis.edit', $last) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
-                                            @else
-                                                <span class="text-muted small">Belum ada rekam</span>
-                                            @endif
-                                        </div>
+                                        <a href="{{ route('dokter.rekam-medis.periksa', $pet->idpet) }}" class="btn btn-sm btn-primary"><i class="bi bi-person-check"></i> Periksa</a>
+                                        @php
+                                            $last = $pet->rekamMedis()->orderBy('created_at','desc')->first();
+                                        @endphp
+                                        @if($last)
+                                            <a href="{{ route('dokter.rekam-medis.show', ['rekam_medi' => $last->idrekam_medis]) }}" class="btn btn-sm btn-outline-secondary ms-2"><i class="bi bi-file-text"></i> Detail</a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty

@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Pet;
 use App\Models\RoleUser;
 use App\Models\TindakanTerapi;
+use App\Models\TemuDokter;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RekamMedisController extends Controller
 {
@@ -18,7 +20,27 @@ class RekamMedisController extends Controller
     public function index()
     {
         // Provide both patient queue and full rekam medis list so the view can show either
-        $pets = Pet::with('pemilik', 'rasHewan.jenisHewan')->orderBy('nama')->get();
+        // We perform a two-step query:
+        // 1) Get pet ids ordered by their latest rekam_medis.created_at (desc)
+        // 2) Fetch Pet models and reorder them in PHP to preserve that ordering.
+        $orderedPetIds = DB::table('pet as p')
+            ->leftJoin('rekam_medis as rm', 'p.idpet', '=', 'rm.idpet')
+            ->select('p.idpet', DB::raw('MAX(rm.created_at) as last_rekam'))
+            ->groupBy('p.idpet')
+            ->orderByDesc('last_rekam')
+            ->orderBy('p.nama')
+            ->pluck('idpet')
+            ->toArray();
+
+        $petsCollection = Pet::with('pemilik', 'rasHewan.jenisHewan')
+            ->whereIn('idpet', $orderedPetIds)
+            ->get()
+            ->keyBy('idpet');
+
+        // Reorder according to $orderedPetIds (pets without rekam will appear last)
+        $pets = collect($orderedPetIds)->map(function($id) use ($petsCollection) {
+            return $petsCollection->get($id);
+        })->filter()->values();
 
         $rekamMedis = RekamMedis::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan', 'roleUser.user'])
             ->orderBy('created_at', 'desc')
@@ -50,15 +72,80 @@ class RekamMedisController extends Controller
             'anamnesa' => 'required|string',
             'diagnosa' => 'required|string',
             'temuan_klinis' => 'required|string',
-            'idpet' => 'required|exists:pets,idpet',
-            'dokter_pemeriksa' => 'nullable|exists:role_users,idrole_user',
+            'idpet' => 'required|exists:pet,idpet',
+            'dokter_pemeriksa' => 'nullable|exists:role_user,idrole_user',
         ]);
 
-        // legacy table uses created_at as tanggal
-        $data['created_at'] = $data['tanggal'];
+        // legacy table uses created_at as tanggal; preserve the date but add current time
+        // so records created via the Perawat form don't get a 00:00 time.
+        $dateOnly = $data['tanggal'];
+        $currentTime = Carbon::now()->format('H:i:s');
+        $data['created_at'] = Carbon::parse($dateOnly . ' ' . $currentTime)->toDateTimeString();
         unset($data['tanggal']);
 
-        $rekam = RekamMedis::create($data);
+        // Ensure `dokter_pemeriksa` is set because the `rekam_medis` table
+        // requires this NOT NULL value. If Perawat did not select a dokter,
+        // auto-assign the first active dokter (role_user) available.
+        if (empty($data['dokter_pemeriksa'])) {
+            $defaultDokter = RoleUser::whereHas('role', function($q){
+                $q->where('nama_role', 'Dokter');
+            })->where('status', 1)->first();
+
+            if ($defaultDokter) {
+                $data['dokter_pemeriksa'] = $defaultDokter->idrole_user;
+            } else {
+                return redirect()->back()->withInput()->with('error', 'Tidak ada dokter aktif untuk ditetapkan. Hubungi administrator.');
+            }
+        }
+
+        // Prevent duplicate records when a placeholder RekamMedis already exists.
+        // If a recent placeholder (empty anamnesa or status_verifikasi=0) exists for the same pet,
+        // update it instead of creating a new RekamMedis. Otherwise create a single record.
+        $rekam = null;
+        $placeholder = RekamMedis::where('idpet', $data['idpet'])
+            ->where(function($q){
+                $q->whereNull('anamnesa')->orWhere('anamnesa', '')->orWhere('status_verifikasi', 0);
+            })
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($placeholder) {
+            // update the placeholder with the submitted data
+            $placeholder->update([
+                'dokter_pemeriksa' => $data['dokter_pemeriksa'],
+                'anamnesa' => $data['anamnesa'] ?? '',
+                'temuan_klinis' => $data['temuan_klinis'] ?? '',
+                'diagnosa' => $data['diagnosa'] ?? '',
+                'status_verifikasi' => $data['status_verifikasi'] ?? 0,
+                'created_at' => $data['created_at'] ?? $placeholder->created_at,
+            ]);
+            $rekam = $placeholder;
+        } else {
+            // Create RekamMedis using explicit fields to avoid accidental NULLs
+            $rekam = RekamMedis::create([
+                'idpet' => $data['idpet'],
+                'dokter_pemeriksa' => $data['dokter_pemeriksa'],
+                'anamnesa' => $data['anamnesa'] ?? '',
+                'temuan_klinis' => $data['temuan_klinis'] ?? '',
+                'diagnosa' => $data['diagnosa'] ?? '',
+                'created_at' => $data['created_at'] ?? now()->toDateTimeString(),
+                'status_verifikasi' => $data['status_verifikasi'] ?? 0,
+            ]);
+        }
+
+        // Jika ada pendaftaran temu dokter terkait (berdasarkan pet yang sama dan status menunggu),
+        // tandai bahwa perawat telah memeriksa pasien sehingga antrean masuk ke dokter.
+        try {
+            // Mark any matching waiting reservations as "Diperiksa" (do not attempt to write
+            // `idrekam_medis` because the `temu_dokter` table does not have that column).
+            TemuDokter::where('idpet', $rekam->idpet)
+                ->where('status', TemuDokter::STATUS_MENUNGGU)
+                ->update([
+                    'status' => TemuDokter::STATUS_DIPERIKSA,
+                ]);
+        } catch (\Exception $e) {
+            // Do not fail creation of RekamMedis if updating temu_dokter fails; keep silent.
+        }
 
         // persist selected tindakan if provided
         if ($request->filled('idkode_tindakan_terapi')) {
@@ -78,29 +165,52 @@ class RekamMedisController extends Controller
     public function show($id)
     {
         // Eager-load pet, owner->user, ras/jenis, and dokter (roleUser->user)
-        $rekamMedis = RekamMedis::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan', 'roleUser.user'])->find($id);
-
-        if (! $rekamMedis) {
-            abort(404, 'Rekam Medis tidak ditemukan.');
-        }
+        // Use findOrFail to ensure a proper 404 for invalid ids and be explicit
+        // that $id is the primary key for rekam_medis.
+        $rekamMedis = RekamMedis::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan', 'roleUser.user'])
+            ->findOrFail($id);
 
         // Fallback: if pet relation is not present, try to load Pet by idpet
         if ((! $rekamMedis->relationLoaded('pet') || ! $rekamMedis->pet) && $rekamMedis->idpet) {
-            // ensure we load pemilik->user as well in the fallback
             $pet = Pet::with(['pemilik.user', 'rasHewan.jenisHewan'])->find($rekamMedis->idpet);
             if ($pet) {
                 $rekamMedis->setRelation('pet', $pet);
             }
         }
 
-        // fetch associated tindakan (if any)
+        // Find the latest RekamMedis for the same pet (so Perawat sees the most
+        // recent anamnesa/temuan_klinis/diagnosa after they saved it).
+        $displayRekam = $rekamMedis;
+        if ($rekamMedis->idpet) {
+            $latest = RekamMedis::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan', 'roleUser.user'])
+                ->where('idpet', $rekamMedis->idpet)
+                ->orderByDesc('created_at')
+                ->first();
+
+            if ($latest) {
+                $displayRekam = $latest;
+
+                // Ensure pet relation loaded for the latest record as well
+                if ((! $displayRekam->relationLoaded('pet') || ! $displayRekam->pet) && $displayRekam->idpet) {
+                    $pet = Pet::with(['pemilik.user','rasHewan.jenisHewan'])->find($displayRekam->idpet);
+                    if ($pet) {
+                        $displayRekam->setRelation('pet', $pet);
+                    }
+                }
+            }
+        }
+
+        // fetch associated tindakan (if any) for the displayed record
         $tindakan = DB::table('detail_rekam_medis')
             ->join('kode_tindakan_terapi', 'detail_rekam_medis.idkode_tindakan_terapi', '=', 'kode_tindakan_terapi.idkode_tindakan_terapi')
-            ->where('detail_rekam_medis.idrekam_medis', $rekamMedis->idrekam_medis)
+            ->where('detail_rekam_medis.idrekam_medis', $displayRekam->idrekam_medis)
             ->select('kode', 'deskripsi_tindakan_terapi')
             ->first();
 
-        return view('perawat.rekam-medis.show', compact('rekamMedis', 'tindakan'));
+        // Pass the latest/display RekamMedis to the view so the detail page
+        // shows the most recent data for that pet (this ensures newly saved
+        // anamnesa/temuan/diagnosa appear immediately on the detail page).
+        return view('perawat.rekam-medis.show', ['rekamMedis' => $displayRekam, 'tindakan' => $tindakan, 'originalRekam' => $rekamMedis]);
     }
 
     /**
@@ -136,11 +246,13 @@ class RekamMedisController extends Controller
             'anamnesa' => 'required|string',
             'diagnosa' => 'required|string',
             'temuan_klinis' => 'required|string',
-            'idpet' => 'required|exists:pets,idpet',
-            'dokter_pemeriksa' => 'nullable|exists:role_users,idrole_user',
+            'idpet' => 'required|exists:pet,idpet',
+            'dokter_pemeriksa' => 'nullable|exists:role_user,idrole_user',
         ]);
 
-        $data['created_at'] = $data['tanggal'];
+        $dateOnly = $data['tanggal'];
+        $currentTime = Carbon::now()->format('H:i:s');
+        $data['created_at'] = Carbon::parse($dateOnly . ' ' . $currentTime)->toDateTimeString();
         unset($data['tanggal']);
 
         $rekamMedis->update($data);

@@ -39,6 +39,11 @@
 
                             <div class="mb-3">
                                 <label for="idpemilik" class="form-label">Pemilik <span class="text-danger">*</span></label>
+
+                                <div class="mb-2">
+                                    <input type="search" id="pemilik_search" class="form-control" placeholder="Cari nama pemilik..." autocomplete="off">
+                                </div>
+
                                 <select name="idpemilik" id="idpemilik" class="form-select @error('idpemilik') is-invalid @enderror" required>
                                     <option value="">-- Pilih Pemilik --</option>
                                     @foreach($pemilik as $p)
@@ -94,6 +99,44 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() { const first = document.querySelector('[autofocus]'); if(first) first.focus(); });
+document.addEventListener('DOMContentLoaded', function() {
+    const first = document.querySelector('[autofocus]'); if(first) first.focus();
+
+    const search = document.getElementById('pemilik_search');
+    const select = document.getElementById('idpemilik');
+
+    if (search && select) {
+        search.addEventListener('input', function() {
+            const q = this.value.trim().toLowerCase();
+            // iterate options and toggle visibility
+            for (let i = 0; i < select.options.length; i++) {
+                const opt = select.options[i];
+                if (opt.value === '') { // keep placeholder
+                    opt.style.display = '';
+                    continue;
+                }
+                const text = (opt.text || '').toLowerCase();
+                if (q === '' || text.indexOf(q) !== -1) {
+                    opt.style.display = '';
+                } else {
+                    opt.style.display = 'none';
+                }
+            }
+
+            // If only one match (excluding placeholder), auto-select it
+            if (q !== '') {
+                const visible = Array.from(select.options).filter(o => o.value !== '' && o.style.display !== 'none');
+                if (visible.length === 1) {
+                    select.value = visible[0].value;
+                } else {
+                    // if current selection is hidden, clear selection
+                    if (select.selectedOptions.length && select.selectedOptions[0].style.display === 'none') {
+                        select.value = '';
+                    }
+                }
+            }
+        });
+    }
+});
 </script>
 @endsection

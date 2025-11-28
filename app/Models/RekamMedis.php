@@ -18,6 +18,7 @@ class RekamMedis extends Model
         'temuan_klinis',
         'idpet',
         'dokter_pemeriksa',
+        'status_verifikasi',
     ];
 
     // Table only has created_at (no updated_at), so disable automatic timestamps

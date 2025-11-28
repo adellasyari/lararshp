@@ -37,18 +37,7 @@
                                 <input type="text" id="nama" class="form-control" value="{{ $user->nama }}" disabled>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" required>
-                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password (kosongkan jika tidak ingin ganti)</label>
-                                <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror">
-                                @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-                            <hr>
+                            <!-- Email & password are managed on the user account; admin edits only profile fields here -->
                             <div class="mb-3">
                                 <label for="alamat" class="form-label">Alamat</label>
                                 <textarea name="alamat" id="alamat" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', optional($user->perawat)->alamat) }}</textarea>

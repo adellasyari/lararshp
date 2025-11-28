@@ -60,8 +60,9 @@
                                             <a href="{{ route('perawat.rekam-medis.create') }}?idpet={{ $pet->idpet }}" class="btn btn-sm btn-primary"><i class="bi bi-person-check"></i> Periksa</a>
                                             @php $last = $pet->rekamMedis()->orderBy('created_at','desc')->first(); @endphp
                                             @if($last)
-                                                <a href="{{ route('perawat.rekam-medis.show', $last) }}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
-                                                <a href="{{ route('perawat.rekam-medis.edit', $last) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                                {{-- pass the rekam_medis primary key explicitly to avoid accidental passing of unrelated ids --}}
+                                                <a href="{{ route('perawat.rekam-medis.show', $last->idrekam_medis) }}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> Detail</a>
+                                                <a href="{{ route('perawat.rekam-medis.edit', $last->idrekam_medis) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
                                             @else
                                                 <span class="text-muted small">Belum ada rekam</span>
                                             @endif

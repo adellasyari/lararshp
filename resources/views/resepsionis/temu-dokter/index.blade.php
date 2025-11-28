@@ -21,20 +21,12 @@
 <div class="app-content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h3 class="card-title">Tabel Data Temu Dokter</h3>
-                        <div class="card-tools">
-                            <a href="{{ route('resepsionis.temu-dokter.create') }}" class="btn btn-primary btn-sm">
-                                <i class="bi bi-plus-circle"></i> Tambah Pendaftaran
-                            </a>
-                            <a href="{{ route('resepsionis.dashboard') }}" class="btn btn-secondary btn-sm ms-2">
-                                <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
-                            </a>
-                        </div>
+                        <h3 class="card-title">Daftarkan Janji Temu Baru</h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         @if(session('success'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 {{ session('success') }}
@@ -42,74 +34,135 @@
                             </div>
                         @endif
 
-                        @php $list = $temuDokters ?? collect(); @endphp
+                        <a href="{{ route('resepsionis.temu-dokter.create') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i> Buat Pendaftaran Baru
+                        </a>
+                    </div>
+                </div>
 
-                        @if($list->count() > 0)
-                            <table class="table table-bordered">
-                                <thead>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Daftar Antrian Hari Ini</h3>
+                    </div>
+                    <div class="card-body">
+                        @php $antrian = $antrianHariIni ?? collect(); @endphp
+                        @if($antrian->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No Antrian</th>
+                                            <th>Waktu</th>
+                                            <th>Nama Hewan</th>
+                                            <th>Pemilik</th>
+                                            <th>Dokter</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($antrian as $item)
+                                            @php $tid = $item->idreservasi_dokter ?? $item->id ?? (method_exists($item,'getKey') ? $item->getKey() : ''); @endphp
+                                                <tr>
+                                                    <td><strong>#{{ $item->no_urut ?? $loop->iteration }}</strong></td>
+                                                    <td>
+                                                        @php
+                                                            // Show the waktu_daftar value exactly as stored in DB
+                                                            if($item->waktu_daftar) {
+                                                                echo \Illuminate\Support\Carbon::parse($item->waktu_daftar)->format('d/m/Y H:i');
+                                                            } else {
+                                                                echo '-';
+                                                            }
+                                                        @endphp
+                                                    </td>
+                                                    <td>{{ $item->pet->nama ?? '-' }}</td>
+                                                    <td>{{ optional($item->pet->pemilik->user)->nama ?? '-' }}</td>
+                                                    <td>{{ $item->dokter->user->nama ?? $item->dokter->nama ?? '-' }}</td>
+                                                    <td>
+                                                        @php $s = (string)($item->status ?? ''); @endphp
+                                                        @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)
+                                                            <span class="badge bg-warning text-dark">Menunggu</span>
+                                                        @elseif($s === \App\Models\TemuDokter::STATUS_DIPERIKSA)
+                                                            <span class="badge bg-success">Diperiksa</span>
+                                                        @else
+                                                            <span class="badge bg-secondary">{{ $item->status_label }}</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            {{-- Cancel / Delete form --}}
+                                                            <form action="{{ route('resepsionis.temu-dokter.destroy', ['id' => $item->getKey() ?? $item->idreservasi_dokter ?? $item->id]) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Batalkan pendaftaran ini?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger">Batal</button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-muted">Belum ada antrian untuk hari ini.</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Riwayat Semua Janji Temu</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        @php $list = $riwayat ?? collect(); @endphp
+                        <div style="max-height:480px; overflow:auto;">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <th style="width:10px">#</th>
-                                        <th>Tanggal</th>
+                                        <th>ID</th>
                                         <th>Waktu</th>
-                                        <th>No. Urut</th>
                                         <th>Nama Hewan</th>
-                                        <th>Dokter</th>
-                                        <th style="width:150px">Aksi</th>
+                                        <th>Pemilik</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($list as $index => $temu)
-                                        @php $tid = $temu->idreservasi_dokter ?? $temu->id ?? (method_exists($temu,'getKey') ? $temu->getKey() : ''); @endphp
-                                        <tr class="align-middle">
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $temu->tanggal ?? ($temu->waktu_daftar ? \Illuminate\Support\Carbon::parse($temu->waktu_daftar)->format('Y-m-d') : '-') }}</td>
-                                            <td>{{ $temu->waktu ?? ($temu->waktu_daftar ? \Illuminate\Support\Carbon::parse($temu->waktu_daftar)->format('H:i') : '-') }}</td>
-                                            <td>{{ $temu->no_urut ?? '-' }}</td>
-                                            <td>{{ $temu->pet->nama ?? '-' }}</td>
-                                            <td>{{ $temu->dokter->user->nama ?? $temu->dokter->user->name ?? ($temu->dokter->nama ?? '-') }}</td>
+                                    @forelse($list as $r)
+                                        <tr>
+                                            <td>{{ $r->id ?? ($r->getKey() ?? '-') }}</td>
                                             <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ $tid ? route('resepsionis.temu-dokter.edit', $tid) : '#' }}" class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-pencil-square"></i> Edit
-                                                    </a>
-                                                    <form action="{{ $tid ? route('resepsionis.temu-dokter.destroy', $tid) : '#' }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete(this);">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
-                                                            <i class="bi bi-trash"></i> Hapus
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                @php
+                                                    if($r->waktu_daftar) {
+                                                        echo \Illuminate\Support\Carbon::parse($r->waktu_daftar)->format('Y-m-d H:i');
+                                                    } else {
+                                                        echo '-';
+                                                    }
+                                                @endphp
+                                            </td>
+                                            <td>{{ $r->pet->nama ?? '-' }}</td>
+                                            <td>{{ optional($r->pet->pemilik->user)->nama ?? '-' }}</td>
+                                            <td>
+                                                @php $s = (string)($r->status ?? ''); @endphp
+                                                @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)
+                                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                                @elseif($s === \App\Models\TemuDokter::STATUS_DIPERIKSA)
+                                                    <span class="badge bg-primary">Diperiksa</span>
+                                                @else
+                                                    <span class="badge bg-secondary">{{ $r->status_label }}</span>
+                                                @endif
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-muted">Riwayat kosong.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
-                        @else
-                            <div class="d-flex flex-column align-items-center py-4 text-center">
-                                <i class="bi bi-inbox display-4 text-muted mb-3"></i>
-                                <h5 class="text-muted">Data temu dokter masih kosong</h5>
-                                <p class="text-muted">Silakan tambah pendaftaran temu dokter baru</p>
-                                <a href="{{ route('resepsionis.temu-dokter.create') }}" class="btn btn-primary">
-                                    <i class="bi bi-plus-circle"></i> Tambah Pendaftaran
-                                </a>
-                            </div>
-                        @endif
-                    </div>
-                    @if($list->count() > 0)
-                    <div class="card-footer clearfix">
-                        <div class="float-start">Menampilkan {{ $list->count() }} data temu dokter</div>
-                        <div class="float-end">
-                            <ul class="pagination pagination-sm m-0">
-                                <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                            </ul>
                         </div>
                     </div>
-                    @endif
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 19, 2025 at 11:49 AM
+-- Generation Time: Nov 26, 2025 at 01:16 PM
 -- Server version: 8.0.41
 -- PHP Version: 8.2.28
 
@@ -84,6 +84,14 @@ CREATE TABLE `dokter` (
   `jenis_kelamin` varchar(1) DEFAULT NULL,
   `id_user` bigint UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `dokter`
+--
+
+INSERT INTO `dokter` (`id_dokter`, `alamat`, `no_hp`, `bidang_dokter`, `jenis_kelamin`, `id_user`) VALUES
+(6, 'Jl. Dinoyo', '081233334', 'Dokter Umum', 'L', 7),
+(7, 'Jl. Melati No. 45, Jakarta', '081255556666', 'Dokter Bedah', 'P', 12);
 
 -- --------------------------------------------------------
 
@@ -254,7 +262,8 @@ INSERT INTO `kode_tindakan_terapi` (`idkode_tindakan_terapi`, `kode`, `deskripsi
 (31, 'T29', 'Observasi lebih dari 1 hari', 7, 2),
 (32, 'T30', 'Grooming medis', 8, 2),
 (33, 'T31', 'Deworming', 8, 1),
-(34, 'T32', 'Ektoparasit control', 8, 1);
+(34, 'T32', 'Ektoparasit control', 8, 1),
+(35, 'T50', 'hugyufyu', 7, 1);
 
 -- --------------------------------------------------------
 
@@ -311,7 +320,8 @@ INSERT INTO `pemilik` (`idpemilik`, `no_wa`, `alamat`, `iduser`) VALUES
 (2, '08123456', 'sukodono', 11),
 (3, '08765432', 'kosagra', 13),
 (4, '08567432167', 'ngagel', 14),
-(5, '08976543', 'srikana', 15);
+(5, '08976543', 'srikana', 15),
+(6, '08198765432', 'Gunung anyar', 17);
 
 -- --------------------------------------------------------
 
@@ -327,6 +337,15 @@ CREATE TABLE `perawat` (
   `pendidikan` varchar(100) DEFAULT NULL,
   `id_user` bigint UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `perawat`
+--
+
+INSERT INTO `perawat` (`id_perawat`, `alamat`, `no_hp`, `jenis_kelamin`, `pendidikan`, `id_user`) VALUES
+(1, 'Jl. Kenanga No. 20, Surabaya', '085677778888', 'P', 'D3 Keperawatan', 6),
+(2, 'Jl. Dahlia No. 15, Sidoarjo', '085699990000', 'L', 'S1 Ners', 7),
+(3, 'Jl. Kamboja No. 8, Gresik', '085611112222', 'P', 'D3 Keperawatan', 8);
 
 -- --------------------------------------------------------
 
@@ -353,7 +372,8 @@ INSERT INTO `pet` (`idpet`, `nama`, `tanggal_lahir`, `warna_tanda`, `jenis_kelam
 (2, 'cicak', '2025-09-01', 'pink', 'B', 2, 6),
 (3, 'kucing', '2019-10-20', 'kuning', 'B', 3, 4),
 (4, 'ayam', '2024-02-01', 'hitam', 'J', 4, 8),
-(5, 'kelinci', '2025-09-01', 'putih', 'B', 5, 5);
+(5, 'kelinci', '2025-09-01', 'putih', 'B', 5, 5),
+(6, 'Jerapah', '2025-11-12', 'kuning', 'L', 6, 37);
 
 -- --------------------------------------------------------
 
@@ -495,9 +515,9 @@ INSERT INTO `role_user` (`idrole_user`, `iduser`, `idrole`, `status`) VALUES
 (7, 12, 2, 1),
 (8, 10, 5, 1),
 (9, 11, 5, 1),
-(10, 13, 5, 1),
 (11, 14, 5, 1),
-(12, 15, 5, 1);
+(12, 15, 5, 1),
+(20, 13, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -772,7 +792,7 @@ ALTER TABLE `detail_rekam_medis`
 -- AUTO_INCREMENT for table `dokter`
 --
 ALTER TABLE `dokter`
-  MODIFY `id_dokter` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_dokter` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -784,7 +804,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `jenis_hewan`
 --
 ALTER TABLE `jenis_hewan`
-  MODIFY `idjenis_hewan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `idjenis_hewan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `jobs`
@@ -796,19 +816,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `kategori`
 --
 ALTER TABLE `kategori`
-  MODIFY `idkategori` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `idkategori` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `kategori_klinis`
 --
 ALTER TABLE `kategori_klinis`
-  MODIFY `idkategori_klinis` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idkategori_klinis` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `kode_tindakan_terapi`
 --
 ALTER TABLE `kode_tindakan_terapi`
-  MODIFY `idkode_tindakan_terapi` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `idkode_tindakan_terapi` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -820,43 +840,43 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `pemilik`
 --
 ALTER TABLE `pemilik`
-  MODIFY `idpemilik` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idpemilik` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `perawat`
 --
 ALTER TABLE `perawat`
-  MODIFY `id_perawat` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_perawat` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `pet`
 --
 ALTER TABLE `pet`
-  MODIFY `idpet` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idpet` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `ras_hewan`
 --
 ALTER TABLE `ras_hewan`
-  MODIFY `idras_hewan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `idras_hewan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `rekam_medis`
 --
 ALTER TABLE `rekam_medis`
-  MODIFY `idrekam_medis` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `idrekam_medis` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `role`
 --
 ALTER TABLE `role`
-  MODIFY `idrole` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `idrole` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `role_user`
 --
 ALTER TABLE `role_user`
-  MODIFY `idrole_user` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `idrole_user` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `temu_dokter`
@@ -868,13 +888,13 @@ ALTER TABLE `temu_dokter`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `iduser` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `iduser` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
