@@ -81,7 +81,7 @@
                         <tbody>
                             @forelse($pemiliks ?? [] as $p)
                             <tr>
-                                <td>{{ $p->nama ?? ($p->user->nama ?? '—') }}</td>
+                                <td>{{ $p->nama ?? ($p->user->name ?? '—') }}</td>
                                 <td class="text-end">{{ $p->no_wa ?? '—' }}</td>
                             </tr>
                             @empty

@@ -34,10 +34,10 @@
                   <dd class="col-sm-8">{{ optional($rek->pet)->nama ?? '-' }}</dd>
 
                   <dt class="col-sm-4">Nama Pemilik</dt>
-                  <dd class="col-sm-8">{{ optional(optional(optional($rek->pet)->pemilik)->user)->nama ?? '-' }}</dd>
+                  <dd class="col-sm-8">{{ optional(optional(optional($rek->pet)->pemilik)->user)->name ?? '-' }}</dd>
 
                   <dt class="col-sm-4">Dokter Pemeriksa</dt>
-                  <dd class="col-sm-8">{{ optional($rek->roleUser)->user->nama ?? (optional($rek->dokter)->nama ?? ($rek->dokter_pemeriksa ?? '-')) }}</dd>
+                  <dd class="col-sm-8">{{ optional($rek->roleUser)->user->name ?? (optional($rek->dokter)->nama ?? ($rek->dokter_pemeriksa ?? '-')) }}</dd>
                 </dl>
               </div>
 

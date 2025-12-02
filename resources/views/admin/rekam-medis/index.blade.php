@@ -57,9 +57,9 @@
                                     <td>{{ Illuminate\Support\Str::limit($rm->anamnesa ?? '-', 80) }}</td>
                                     <td>{{ Illuminate\Support\Str::limit($rm->temuan_klinis ?? '-', 80) }}</td>
                                     <td>{{ $rm->pet->nama ?? 'Pet Dihapus' }}</td>
-                                    <td>{{ $rm->pet->pemilik->user->nama ?? 'Pemilik Dihapus' }}</td>
+                                    <td>{{ $rm->pet->pemilik->user->name ?? 'Pemilik Dihapus' }}</td>
                                     <td>{{ $rm->pet->rasHewan->nama_ras ?? 'Ras Dihapus' }}</td>
-                                    <td>{{ $rm->dokter->nama ?? 'Dokter Dihapus' }}</td>
+                                    <td>{{ $rm->dokter->name ?? 'Dokter Dihapus' }}</td>
                                     <td>{{ $rm->diagnosa ?? '-' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">

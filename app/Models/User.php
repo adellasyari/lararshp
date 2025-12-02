@@ -22,14 +22,9 @@ class User extends Authenticatable
     // --- PERUBAHAN DARI GAMBAR ---
 
     /**
-     * 1. Menentukan nama tabel kustom
+     * Using default Laravel `users` table and `id` primary key
+     * (legacy `user`/`iduser` removed after migration)
      */
-    protected $table = 'user';
-
-    /**
-     * 2. Menentukan primary key kustom
-     */
-    protected $primaryKey = 'iduser';
 
     /**
      * 3. Kolom yang boleh diisi (mass assignable)
@@ -37,15 +32,13 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'nama', // Diubah dari 'name'
+        'name',
         'email',
         'password',
-        'idrole', // Foreign key ke tabel role
     ];
 
-    // The `user` table in this project does not have Laravel timestamp columns
-    // so disable automatic timestamps to avoid inserting `created_at`/`updated_at`.
-    public $timestamps = false;
+    // The standard `users` table uses Laravel timestamps
+    public $timestamps = true;
 
     /**
      * 4. Relasi ke tabel Pemilik
@@ -54,7 +47,7 @@ class User extends Authenticatable
     public function pemilik()
     {
         // Parameter: (ModelTujuan, foreign_key, local_key)
-        return $this->hasOne(Pemilik::class, 'iduser', 'iduser');
+        return $this->hasOne(Pemilik::class, 'iduser', 'id');
     }
 
     /**
@@ -62,7 +55,7 @@ class User extends Authenticatable
      */
     public function dokter()
     {
-        return $this->hasOne(Dokter::class, 'id_user', 'iduser');
+        return $this->hasOne(Dokter::class, 'id_user', 'id');
     }
 
     /**
@@ -70,7 +63,7 @@ class User extends Authenticatable
      */
     public function perawat()
     {
-        return $this->hasOne(Perawat::class, 'id_user', 'iduser');
+        return $this->hasOne(Perawat::class, 'id_user', 'id');
     }
 
     public function roles()

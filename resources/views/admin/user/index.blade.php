@@ -48,7 +48,7 @@
                                 @forelse ($users as $index => $item)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ $item->nama }}</td>
+                                    <td>{{ $item->name }}</td>
                                     <td>{{ $item->email }}</td>
                                     <td>
                                         @foreach ($item->roles as $role)
@@ -57,8 +57,8 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.user.edit', $item->iduser) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
-                                            <form action="{{ route('admin.user.destroy', $item->iduser) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                            <a href="{{ route('admin.user.edit', $item->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</a>
+                                            <form action="{{ route('admin.user.destroy', $item->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Hapus</button>

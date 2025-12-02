@@ -45,15 +45,15 @@
                                 <tbody>
                                     @foreach($users as $u)
                                     <tr>
-                                        <td>{{ $u->iduser }}</td>
-                                        <td>{{ $u->nama }}</td>
+                                        <td>{{ $u->id }}</td>
+                                        <td>{{ $u->name }}</td>
                                         <td>{{ $u->email }}</td>
                                         <td>{{ optional($u->perawat)->pendidikan ?? '-' }}</td>
                                         <td>{{ optional($u->perawat)->no_hp ?? '-' }}</td>
                                         <td>{{ optional($u->perawat)->alamat ?? '-' }}</td>
                                         <td>
-                                            <a href="{{ route('admin.perawat.edit', $u->iduser) }}" class="btn btn-sm btn-warning">Edit</a>
-                                            <form action="{{ route('admin.perawat.destroy', $u->iduser) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus perawat ini?');">
+                                            <a href="{{ route('admin.perawat.edit', $u->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="{{ route('admin.perawat.destroy', $u->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus perawat ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-sm btn-danger">Hapus</button>

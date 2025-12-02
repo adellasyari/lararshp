@@ -43,7 +43,7 @@
                                 <select name="idpemilik" id="idpemilik" class="form-select @error('idpemilik') is-invalid @enderror" required>
                                     <option value="">-- Pilih Pemilik --</option>
                                     @foreach($pemilik as $p)
-                                        <option value="{{ $p->idpemilik }}" {{ old('idpemilik', $pet->idpemilik) == $p->idpemilik ? 'selected' : '' }}>{{ $p->user->nama ?? 'User Dihapus' }}</option>
+                                        <option value="{{ $p->idpemilik }}" {{ old('idpemilik', $pet->idpemilik) == $p->idpemilik ? 'selected' : '' }}>{{ $p->user->name ?? 'User Dihapus' }}</option>
                                     @endforeach
                                 </select>
                                 @error('idpemilik')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -100,7 +100,7 @@
                             <dd class="col-sm-7">{{ $pet->getKey() }}</dd>
 
                             <dt class="col-sm-5">Pemilik</dt>
-                            <dd class="col-sm-7">{{ $pet->pemilik->user->nama ?? 'N/A' }}</dd>
+                            <dd class="col-sm-7">{{ $pet->pemilik->user->name ?? 'N/A' }}</dd>
 
                             <dt class="col-sm-5">Dibuat</dt>
                             <dd class="col-sm-7">{{ optional($pet->created_at)->format('d M Y H:i') ?? '-' }}</dd>

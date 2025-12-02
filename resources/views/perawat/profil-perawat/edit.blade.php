@@ -29,7 +29,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Nama</label>
-                                <input type="text" class="form-control" value="{{ $user->nama ?? $user->email }}" disabled>
+                                <input type="text" class="form-control" value="{{ $user->name ?? $user->email }}" disabled>
                             </div>
 
                             <div class="mb-3">

@@ -37,13 +37,13 @@
               <dd class="col-sm-9">{{ optional($rekamMedis->pet)->nama ?? '-' }}</dd>
 
               <dt class="col-sm-3">Nama Pemilik</dt>
-              <dd class="col-sm-9">{{ optional(optional(optional($rekamMedis->pet)->pemilik)->user)->nama ?? '-' }}</dd>
+              <dd class="col-sm-9">{{ optional(optional(optional($rekamMedis->pet)->pemilik)->user)->name ?? '-' }}</dd>
 
               <dt class="col-sm-3">Ras / Jenis</dt>
               <dd class="col-sm-9">{{ optional(optional($rekamMedis->pet)->rasHewan)->nama_ras ?? '-' }} / {{ optional(optional(optional($rekamMedis->pet)->rasHewan)->jenisHewan)->nama_jenis_hewan ?? '-' }}</dd>
 
               <dt class="col-sm-3">Dokter Pemeriksa</dt>
-              <dd class="col-sm-9">{{ optional($rekamMedis->roleUser)->user->nama ?? (optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-')) }}</dd>
+              <dd class="col-sm-9">{{ optional($rekamMedis->roleUser)->user->name ?? (optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-')) }}</dd>
 
               <dt class="col-sm-3">Anamnesa</dt>
               <dd class="col-sm-9">{{ $rekamMedis->anamnesa ?? '-' }}</dd>

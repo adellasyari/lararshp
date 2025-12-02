@@ -72,7 +72,9 @@
 								<select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
 									<option value="">-- Pilih Hewan --</option>
 									@foreach($pets as $p)
-										<option value="{{ $p->idpet }}" {{ (isset($selectedPet) && $selectedPet == $p->idpet) || old('idpet') == $p->idpet ? 'selected' : '' }}>{{ $p->nama }}{{ optional($p->pemilik)->nama ? ' ('.optional($p->pemilik)->nama.')' : '' }}</option>
+										<option value="{{ $p->idpet }}" {{ (isset($selectedPet) && $selectedPet == $p->idpet) || old('idpet') == $p->idpet ? 'selected' : '' }}>
+											{{ $p->nama }}{{ optional(optional($p->pemilik)->user)->name ? ' ('.optional(optional($p->pemilik)->user)->name.')' : (optional($p->pemilik)->nama ? '('.optional($p->pemilik)->nama.')' : '') }}
+										</option>
 									@endforeach
 								</select>
 								@error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -83,7 +85,7 @@
 								<select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror">
 									<option value="">-- Pilih Dokter --</option>
 									@foreach($dokters as $d)
-										<option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa') == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? $d->idrole_user }}</option>
+										<option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa') == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->name ?? $d->idrole_user }}</option>
 									@endforeach
 								</select>
 								@error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -112,10 +114,10 @@
 							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional($rekamMedis->pet)->nama ?? '-') : (isset($petSelected) ? $petSelected->nama : '-') }}</dd>
 
 							<dt class="col-sm-4">Nama Pemilik</dt>
-							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional(optional(optional($rekamMedis->pet)->pemilik)->user)->nama ?? '-' ) : (isset($petSelected) ? optional(optional($petSelected->pemilik)->user)->nama ?? '-' : '-') }}</dd>
+							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional(optional(optional($rekamMedis->pet)->pemilik)->user)->name ?? (optional(optional($rekamMedis->pet)->pemilik)->nama ?? '-') ) : (isset($petSelected) ? (optional(optional($petSelected->pemilik)->user)->name ?? (optional($petSelected->pemilik)->nama ?? '-')) : '-') }}</dd>
 
 							<dt class="col-sm-4">Dokter Pemeriksa</dt>
-							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional($rekamMedis->roleUser)->user->nama ?? (optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-'))) : '-' }}</dd>
+							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional(optional($rekamMedis->roleUser)->user)->name ?? (optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-'))) : '-' }}</dd>
 						</dl>
 					</div>
 				</div>

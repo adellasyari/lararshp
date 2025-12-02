@@ -54,7 +54,7 @@
                                 <tr class="align-middle">
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $item->nama }}</td>
-                                    <td>{{ $item->pemilik->user->nama ?? 'User Dihapus' }}</td>
+                                    <td>{{ $item->pemilik->user->name ?? 'User Dihapus' }}</td>
                                     <td>{{ $item->rasHewan->jenisHewan->nama_jenis_hewan ?? 'Jenis Dihapus' }}</td>
                                     <td>{{ $item->rasHewan->nama_ras ?? $item->rasHewan->nama_ras_hewan ?? 'Ras Dihapus' }}</td>
                                     <td>{{ $item->tanggal_lahir }}</td>

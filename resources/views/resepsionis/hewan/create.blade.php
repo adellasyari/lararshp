@@ -47,7 +47,7 @@
                                 <select name="idpemilik" id="idpemilik" class="form-select @error('idpemilik') is-invalid @enderror" required>
                                     <option value="">-- Pilih Pemilik --</option>
                                     @foreach($pemilik as $p)
-                                        <option value="{{ $p->idpemilik }}" {{ old('idpemilik') == $p->idpemilik ? 'selected' : '' }}>{{ $p->user->nama ?? 'User Dihapus' }}</option>
+                                        <option value="{{ $p->idpemilik }}" {{ old('idpemilik') == $p->idpemilik ? 'selected' : '' }}>{{ $p->user->name ?? 'User Dihapus' }}</option>
                                     @endforeach
                                 </select>
                                 @error('idpemilik')<div class="invalid-feedback">{{ $message }}</div>@enderror

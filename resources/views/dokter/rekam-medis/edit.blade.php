@@ -71,19 +71,18 @@
                             <dd class="col-sm-7" id="info-pet">{{ optional($rekamMedis->pet)->nama ?? '-' }}</dd>
 
                             <dt class="col-sm-5">Pemilik</dt>
-                            <dd class="col-sm-7" id="info-pemilik">{{ optional(optional(optional($rekamMedis->pet)->pemilik)->user)->nama ?? '-' }}</dd>
+                            <dd class="col-sm-7" id="info-pemilik">{{ optional(optional(optional($rekamMedis->pet)->pemilik)->user)->name ?? (optional(optional($rekamMedis->pet)->pemilik)->nama ?? '-') }}</dd>
 
                             <dt class="col-sm-5">Ras / Jenis</dt>
                             <dd class="col-sm-7" id="info-rasjenis">{{ optional(optional($rekamMedis->pet)->rasHewan)->nama_ras ?? '-' }} / {{ optional(optional(optional($rekamMedis->pet)->rasHewan)->jenisHewan)->nama_jenis_hewan ?? '-' }}</dd>
 
                             <dt class="col-sm-5">Dokter</dt>
-                            <dd class="col-sm-7" id="info-dokter">{{ optional(optional($rekamMedis->roleUser)->user)->nama ?? optional($rekamMedis->dokter)->nama ?? '-' }}</dd>
+                            <dd class="col-sm-7" id="info-dokter">{{ optional(optional($rekamMedis->roleUser)->user)->name ?? optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-') }}</dd>
 
                             <dt class="col-sm-5">Dibuat</dt>
                             <dd class="col-sm-7" id="info-created">{{ $rekamMedis->created_at ? \Carbon\Carbon::parse($rekamMedis->created_at)->format('d M Y H:i') : '-' }}</dd>
 
-                            <dt class="col-sm-5">Terakhir diubah</dt>
-                            <dd class="col-sm-7" id="info-updated">{{ $rekamMedis->updated_at ? \Carbon\Carbon::parse($rekamMedis->updated_at)->format('d M Y H:i') : '-' }}</dd>
+                            <!-- Terakhir diubah removed as requested -->
                         </dl>
                     </div>
                 </div>

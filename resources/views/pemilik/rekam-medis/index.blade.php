@@ -51,19 +51,43 @@
                                             <th>Anamnesa</th>
                                             <th>Temuan Klinis</th>
                                             <th>Tindakan</th>
-                                            <th>Obat</th>
+                                            <th>Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($list as $i => $rekamMedis)
                                             <tr>
                                                 <td>{{ $i + 1 }}</td>
-                                                <td>{{ optional($rekamMedis->created_at)->format('Y-m-d') ?? '-' }}</td>
+                                                <td>
+                                                    @php
+                                                        $created = $rekamMedis->created_at ?? null;
+                                                        try {
+                                                            $date = $created ? \Carbon\Carbon::parse($created)->format('d M Y') : '-';
+                                                        } catch (\Exception $e) {
+                                                            $date = is_string($created) && strlen($created) ? $created : '-';
+                                                        }
+                                                    @endphp
+                                                    {{ $date }}
+                                                </td>
                                                 <td>{{ optional($rekamMedis->pet)->nama ?? 'N/A' }}</td>
                                                 <td>{{ $rekamMedis->anamnesa ?? '-' }}</td>
                                                 <td>{{ $rekamMedis->temuan_klinis ?? '-' }}</td>
-                                                <td>{{ $rekamMedis->tindakan ?? '-' }}</td>
-                                                <td>{{ $rekamMedis->obat ?? '-' }}</td>
+                                                <td>
+                                                    @php
+                                                        $tindakanStr = '';
+                                                        if (!empty($rekamMedis->detail_rekam_medis) && $rekamMedis->detail_rekam_medis->isNotEmpty()) {
+                                                            $tindakanStr = $rekamMedis->detail_rekam_medis->map(function($d) {
+                                                                $kode = optional($d->tindakan)->kode ?? null;
+                                                                $desc = optional($d->tindakan)->deskripsi_tindakan_terapi ?? null;
+                                                                if ($kode && $desc) return $kode . ' - ' . $desc;
+                                                                if ($kode) return $kode;
+                                                                return $desc ?? '';
+                                                            })->filter()->join(', ');
+                                                        }
+                                                    @endphp
+                                                    {{ $tindakanStr ?: '-' }}
+                                                </td>
+                                                <td>{{ $rekamMedis->diagnosa ?? '-' }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

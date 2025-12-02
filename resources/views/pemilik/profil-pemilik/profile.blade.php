@@ -26,7 +26,7 @@
                     <div class="card-body">
                         <dl class="row mb-0">
                             <dt class="col-sm-3">Nama</dt>
-                            <dd class="col-sm-9">{{ $user->nama ?? $user->email }}</dd>
+                            <dd class="col-sm-9">{{ $user->name ?? $user->email }}</dd>
 
                             <dt class="col-sm-3">Email</dt>
                             <dd class="col-sm-9">{{ $user->email }}</dd>

@@ -25,14 +25,14 @@
                     <div class="card-body">
                         @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
-                        <form action="{{ route('admin.user.update', $user->iduser) }}" method="POST">
+                        <form action="{{ route('admin.user.update', $user->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
                             <div class="mb-3">
-                                <label for="nama" class="form-label">Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama', $user->nama) }}" required autofocus>
-                                @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}" required autofocus>
+                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
                             <div class="mb-3">
@@ -74,7 +74,7 @@
                 <div class="card">
                     <div class="card-header"><strong>Detail</strong></div>
                     <div class="card-body">
-                        <p class="mb-1"><strong>ID:</strong> {{ $user->iduser }}</p>
+                        <p class="mb-1"><strong>ID:</strong> {{ $user->id }}</p>
                         <p class="mb-1"><strong>Email:</strong> {{ $user->email }}</p>
                         <p class="mb-1"><strong>Terakhir diubah:</strong> {{ optional($user->updated_at)->format('d M Y H:i') }}</p>
                     </div>
@@ -89,7 +89,7 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('nama');
+    const input = document.getElementById('name');
     if (input) input.focus();
 });
 </script>

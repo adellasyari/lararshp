@@ -58,7 +58,6 @@
                                             <th>No. Urut</th>
                                             <th>Nama Hewan</th>
                                             <th>Dokter</th>
-                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -69,8 +68,8 @@
                                                 <td>{{ $t->waktu ?? ($t->waktu_daftar ? \Illuminate\Support\Carbon::parse($t->waktu_daftar)->format('H:i') : '-') }}</td>
                                                 <td>{{ $t->no_urut ?? '-' }}</td>
                                                 <td>{{ optional($t->pet)->nama ?? '-' }}</td>
-                                                <td>{{ optional($t->dokter->user)->nama ?? (optional($t->dokter)->nama ?? '-') }}</td>
-                                                <td>{{ $t->status ?? 'Terdaftar' }}</td>
+                                                <td>{{ optional(optional($t->dokter)->user)->name ?? optional($t->dokter)->nama ?? '-' }}</td>
+                                                
                                             </tr>
                                         @endforeach
                                     </tbody>

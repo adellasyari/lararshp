@@ -57,7 +57,7 @@
                                 @forelse ($pemilik as $index => $item)
                                 <tr class="align-middle">
                                     <td>{{ $index + 1 }}</td>
-                                    <td>{{ $item->user->nama ?? 'User Dihapus/Tidak Ditemukan' }}</td>
+                                    <td>{{ $item->user->name ?? 'User Dihapus/Tidak Ditemukan' }}</td>
                                     <td>{{ $item->no_wa }}</td>
                                     <td>{{ $item->alamat }}</td>
                                     <td>

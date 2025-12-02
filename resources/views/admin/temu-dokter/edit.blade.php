@@ -37,7 +37,7 @@
                                 <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required autofocus>
                                     <option value="">-- Pilih Hewan --</option>
                                     @foreach($pets as $pet)
-                                        <option value="{{ $pet->idpet }}" {{ old('idpet', $temu->idpet) == $pet->idpet ? 'selected' : '' }}>{{ $pet->nama }} - {{ $pet->pemilik->user->nama ?? 'Pemilik N/A' }}</option>
+                                        <option value="{{ $pet->idpet }}" {{ old('idpet', $temu->id) == $pet->idpet ? 'selected' : '' }}>{{ $pet->nama }} - {{ $pet->pemilik->user->name ?? 'Pemilik N/A' }}</option>
                                     @endforeach
                                 </select>
                                 @error('idpet')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -48,7 +48,7 @@
                                 <select name="idrole_user" id="idrole_user" class="form-select @error('idrole_user') is-invalid @enderror" required>
                                     <option value="">-- Pilih Dokter --</option>
                                     @foreach($dokters as $dokter)
-                                        <option value="{{ $dokter->idrole_user }}" {{ old('idrole_user', $temu->idrole_user) == $dokter->idrole_user ? 'selected' : '' }}>{{ $dokter->user->nama ?? $dokter->user->name ?? 'Dokter' }}</option>
+                                        <option value="{{ $dokter->idrole_user }}" {{ old('idrole_user', $temu->idrole_user) == $dokter->idrole_user ? 'selected' : '' }}>{{ $dokter->user->name ?? 'Dokter' }}</option>
                                     @endforeach
                                 </select>
                                 @error('idrole_user')<div class="invalid-feedback">{{ $message }}</div>@enderror

@@ -41,8 +41,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => ['required','string','max:255'],
-            'email' => ['required','email','max:255','unique:user,email'],
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255','unique:users,email'],
             'password' => ['required','string','min:6','confirmed'],
             'roles' => ['nullable','array'],
             'roles.*' => ['exists:role,idrole'],
@@ -50,7 +50,7 @@ class UserController extends Controller
 
         try {
             $user = User::create([
-                'nama' => $validated['nama'],
+                'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
             ]);
@@ -83,15 +83,15 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'nama' => ['required','string','max:255'],
-            'email' => ['required','email','max:255','unique:user,email,' . $user->getKey() . ',iduser'],
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255','unique:users,email,' . $user->getKey() . ',id'],
             'password' => ['nullable','string','min:6','confirmed'],
             'roles' => ['nullable','array'],
             'roles.*' => ['exists:role,idrole'],
         ]);
 
         try {
-            $user->nama = $validated['nama'];
+            $user->name = $validated['name'];
             $user->email = $validated['email'];
             if (!empty($validated['password'])) {
                 $user->password = $validated['password'];
@@ -111,17 +111,17 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        Log::info('UserController@destroy called', ['iduser' => $user->iduser]);
+        Log::info('UserController@destroy called', ['id' => $user->id]);
 
         // Safety: prevent deleting currently authenticated user
-        if (Auth::id() && Auth::id() == $user->iduser) {
+        if (Auth::id() && Auth::id() == $user->id) {
             return redirect()->route('admin.user.index')->with('error', 'Tidak bisa menghapus akun sendiri.');
         }
 
         DB::beginTransaction();
         try {
             // 1) If user is a Pemilik, delete their pets and related records first
-            $pemilik = Pemilik::where('iduser', $user->iduser)->first();
+            $pemilik = Pemilik::where('iduser', $user->id)->first();
             if ($pemilik) {
                 Log::info('Found pemilik record, cleaning pets', ['idpemilik' => $pemilik->idpemilik]);
 
@@ -149,7 +149,7 @@ class UserController extends Controller
             }
 
             // 2) If user has role_user entries (e.g. dokter), remove dependent rekam_medis and temu_dokter first
-            $roleUserIds = RoleUser::where('iduser', $user->iduser)->pluck('idrole_user');
+            $roleUserIds = RoleUser::where('iduser', $user->id)->pluck('idrole_user');
             if ($roleUserIds->isNotEmpty()) {
                 Log::info('Found role_user ids, cleaning dependent records', ['ids' => $roleUserIds->toArray()]);
 
@@ -167,18 +167,18 @@ class UserController extends Controller
                 Log::info('Deleting temu_dokter rows that reference role_user', ['ids' => $roleUserIds->toArray()]);
                 TemuDokter::whereIn('idrole_user', $roleUserIds)->delete();
 
-                Log::info('Deleting role_user rows for user', ['iduser' => $user->iduser]);
-                DB::table('role_user')->where('iduser', $user->iduser)->delete();
+                Log::info('Deleting role_user rows for user', ['id' => $user->id]);
+                DB::table('role_user')->where('iduser', $user->id)->delete();
             } else {
-                Log::info('No role_user rows found for user', ['iduser' => $user->iduser]);
+                Log::info('No role_user rows found for user', ['id' => $user->id]);
             }
 
             // 3) Remove any Dokter/Perawat records tied to this user (defensive)
-            Dokter::where('id_user', $user->iduser)->delete();
-            Perawat::where('id_user', $user->iduser)->delete();
+            Dokter::where('id_user', $user->id)->delete();
+            Perawat::where('id_user', $user->id)->delete();
 
             // 4) Finally delete the user
-            Log::info('Deleting user record', ['iduser' => $user->iduser]);
+            Log::info('Deleting user record', ['id' => $user->id]);
             $user->delete();
 
             DB::commit();
@@ -186,7 +186,7 @@ class UserController extends Controller
             return redirect()->route('admin.user.index')->with('success', 'User dan relasinya berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting user', ['iduser' => $user->iduser, 'error' => $e->getMessage()]);
+            Log::error('Error deleting user', ['id' => $user->id, 'error' => $e->getMessage()]);
 
             // Provide a specific message when FK constraints block the delete
             $msg = $e->getMessage();

@@ -50,6 +50,7 @@
                                             <th>Tanggal Lahir</th>
                                             <th>Warna / Tanda</th>
                                             <th>Jenis Kelamin</th>
+                                            <th>Pemilik</th>
                                             <th>Ras</th>
                                             <th style="width:120px">Aksi</th>
                                         </tr>
@@ -63,6 +64,7 @@
                                                 <td>{{ $pet->tanggal_lahir ?? '-' }}</td>
                                                 <td>{{ $pet->warna_tanda ?? '-' }}</td>
                                                 <td>{{ $pet->jenis_kelamin ?? '-' }}</td>
+                                                <td>{{ optional(optional($pet->pemilik)->user)->name ?? optional($pet->pemilik)->nama ?? '-' }}</td>
                                                 <td>{{ optional($pet->rasHewan)->nama_ras ?? 'N/A' }}</td>
                                                 <td>
                                                     @if($key)
@@ -77,20 +79,16 @@
                                             </tr>
 
                                             <tr class="collapse" id="pet-details-{{ $key }}">
-                                                <td colspan="7">
+                                                <td colspan="8">
                                                     <div class="card card-body">
                                                         <div class="row">
-                                                            <div class="col-md-3 text-center">
-                                                                <img src="{{ asset('asset/img/pet-placeholder.png') }}" alt="Pet Image" class="img-fluid rounded mb-2" style="max-height:140px;">
-                                                                <p class="text-muted small">ID: {{ $key ?? '-' }}</p>
-                                                            </div>
-                                                            <div class="col-md-9">
+                                                            <div class="col-md-12">
                                                                 <dl class="row mb-0">
                                                                     <dt class="col-sm-4">Nama</dt>
                                                                     <dd class="col-sm-8">{{ $pet->nama ?? '-' }}</dd>
 
                                                                     <dt class="col-sm-4">Pemilik</dt>
-                                                                    <dd class="col-sm-8">{{ optional($pet->pemilik->user)->nama ?? optional($pet->pemilik)->nama ?? '-' }}</dd>
+                                                                    <dd class="col-sm-8">{{ optional(optional($pet->pemilik)->user)->name ?? optional($pet->pemilik)->nama ?? '-' }}</dd>
 
                                                                     <dt class="col-sm-4">Jenis Hewan</dt>
                                                                     <dd class="col-sm-8">{{ optional($pet->rasHewan->jenisHewan)->nama_jenis_hewan ?? '-' }}</dd>
@@ -106,9 +104,6 @@
 
                                                                     <dt class="col-sm-4">Jenis Kelamin</dt>
                                                                     <dd class="col-sm-8">{{ $pet->jenis_kelamin ?? '-' }}</dd>
-
-                                                                    <dt class="col-sm-4">Catatan</dt>
-                                                                    <dd class="col-sm-8">{{ $pet->keterangan ?? '-' }}</dd>
                                                                 </dl>
                                                             </div>
                                                         </div>

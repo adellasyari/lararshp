@@ -45,7 +45,7 @@ class PerawatController extends Controller
     {
         // The perawat create form now selects an existing user via `id_user`.
         $request->validate([
-            'id_user' => 'required|exists:user,iduser|unique:perawat,id_user',
+            'id_user' => 'required|exists:users,id|unique:perawat,id_user',
             'alamat' => 'nullable|string|max:500',
             'no_hp' => 'nullable|string|max:50',
             'pendidikan' => 'nullable|string|max:255',
@@ -58,15 +58,15 @@ class PerawatController extends Controller
         try {
             $user = User::find($request->id_user);
             if (! $user) {
-                return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `user`.');
+                return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `users`.');
             }
 
             // ensure legacy users table has a matching row for FK constraints (perawat.id_user -> users.id)
-            $existsInLegacy = \Illuminate\Support\Facades\DB::table('users')->where('id', $user->iduser)->exists();
+            $existsInLegacy = \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->exists();
             if (! $existsInLegacy) {
                 \Illuminate\Support\Facades\DB::table('users')->insert([
-                    'id' => $user->iduser,
-                    'name' => $user->nama,
+                    'id' => $user->id,
+                    'name' => $user->name,
                     'email' => $user->email,
                     'password' => Hash::make(\Illuminate\Support\Str::random(32)),
                     'created_at' => now(),
@@ -83,7 +83,7 @@ class PerawatController extends Controller
 
             // create perawat record
             $perawat = Perawat::create([
-                'id_user' => $user->iduser,
+                'id_user' => $user->id,
                 'alamat' => $request->alamat,
                 'no_hp' => $request->no_hp,
                 'pendidikan' => $request->pendidikan,

@@ -68,7 +68,7 @@
                                 <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror" required>
                                     <option value="">-- Pilih Dokter (Role User) --</option>
                                     @foreach($doctors as $d)
-                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa', $rekamMedis->dokter_pemeriksa) == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? ('Role: '.$d->role->idrole) }}</option>
+                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa', $rekamMedis->dokter_pemeriksa) == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->name ?? ('Role: '.$d->role->idrole) }}</option>
                                     @endforeach
                                 </select>
                                 @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -94,7 +94,7 @@
                             <dd class="col-sm-7">{{ $rekamMedis->pet->nama ?? '-' }}</dd>
 
                             <dt class="col-sm-5">Dokter</dt>
-                            <dd class="col-sm-7">{{ $rekamMedis->dokter->nama ?? '-' }}</dd>
+                            <dd class="col-sm-7">{{ $rekamMedis->dokter->name ?? '-' }}</dd>
 
                             <dt class="col-sm-5">Dibuat</dt>
                             <dd class="col-sm-7">{{ optional($rekamMedis->created_at)->format('d M Y H:i') ?? '-' }}</dd>

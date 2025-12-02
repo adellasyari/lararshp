@@ -22,7 +22,7 @@ class RekamMedisController extends Controller
                 $petIds = $pemilik->pets()->pluck('idpet');
 
                 if ($petIds->isNotEmpty()) {
-                    $rekamMediss = RekamMedis::with('pet', 'roleUser')
+                    $rekamMediss = RekamMedis::with(['pet.pemilik.user', 'detail_rekam_medis.tindakan', 'roleUser.user'])
                         ->whereIn('idpet', $petIds)
                         ->get();
                 }
@@ -33,7 +33,7 @@ class RekamMedisController extends Controller
                 if ($pemilik) {
                     $petIds = $pemilik->pets()->pluck('idpet');
                     if ($petIds->isNotEmpty()) {
-                        $rekamMediss = RekamMedis::with('pet', 'roleUser')
+                        $rekamMediss = RekamMedis::with(['pet.pemilik.user', 'detail_rekam_medis.tindakan', 'roleUser.user'])
                             ->whereIn('idpet', $petIds)
                             ->get();
                     }

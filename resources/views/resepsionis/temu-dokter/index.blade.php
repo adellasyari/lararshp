@@ -76,8 +76,8 @@
                                                         @endphp
                                                     </td>
                                                     <td>{{ $item->pet->nama ?? '-' }}</td>
-                                                    <td>{{ optional($item->pet->pemilik->user)->nama ?? '-' }}</td>
-                                                    <td>{{ $item->dokter->user->nama ?? $item->dokter->nama ?? '-' }}</td>
+                                                    <td>{{ optional($item->pet->pemilik->user)->name ?? '-' }}</td>
+                                                    <td>{{ $item->dokter->user->name ?? $item->dokter->nama ?? '-' }}</td>
                                                     <td>
                                                         @php $s = (string)($item->status ?? ''); @endphp
                                                         @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)
@@ -142,7 +142,7 @@
                                                 @endphp
                                             </td>
                                             <td>{{ $r->pet->nama ?? '-' }}</td>
-                                            <td>{{ optional($r->pet->pemilik->user)->nama ?? '-' }}</td>
+                                            <td>{{ optional($r->pet->pemilik->user)->name ?? '-' }}</td>
                                             <td>
                                                 @php $s = (string)($r->status ?? ''); @endphp
                                                 @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)

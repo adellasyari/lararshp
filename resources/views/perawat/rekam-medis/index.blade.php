@@ -53,7 +53,7 @@
                                         {{ optional(optional($pet->rasHewan)->jenisHewan)->nama_jenis_hewan ?? '-' }} / 
                                         {{ optional($pet->rasHewan)->nama_ras ?? optional($pet->rasHewan)->nama_ras_hewan ?? '-' }}
                                     </td>
-                                    <td>{{ optional($pet->pemilik)->nama ?? optional(optional($pet->pemilik)->user)->nama ?? '-' }}</td>
+                                    <td>{{ optional(optional($pet->pemilik)->user)->name ?? '-' }}</td>
                                     <td>{{ optional($pet->pemilik)->no_wa ?? '-' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">

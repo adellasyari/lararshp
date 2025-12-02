@@ -64,7 +64,7 @@
                                             <td>{{ $item->nama ?? '-' }}</td>
                                             <td>{{ $item->rasHewan->jenisHewan->nama_jenis_hewan ?? ($item->jenis ?? '-') }}</td>
                                             <td>{{ $item->rasHewan->nama_ras ?? ($item->ras ?? '-') }}</td>
-                                            <td>{{ $item->pemilik->user->nama ?? $item->pemilik->user->name ?? 'User Dihapus' }}</td>
+                                            <td>{{ $item->pemilik->user->name ?? $item->pemilik->user->name ?? 'User Dihapus' }}</td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ $pid ? route('resepsionis.hewan.edit', $pid) : '#' }}" class="btn btn-sm btn-warning">

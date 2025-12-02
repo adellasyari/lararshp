@@ -51,11 +51,12 @@ class PemilikController extends Controller
     {
         $uniqueRule = '';
         return $request->validate([
-            'iduser' => ['required'],
+            'iduser' => ['required','exists:users,id'],
             'no_wa' => ['required','string','min:8','max:20',$uniqueRule],
             'alamat' => ['nullable','string','max:500'],
         ],[
             'iduser.required' => 'User wajib dipilih.',
+            'iduser.exists' => 'User terpilih tidak ditemukan.',
             'no_wa.required' => 'No WA wajib diisi.',
         ]);
     }

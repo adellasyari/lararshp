@@ -37,7 +37,7 @@
                                 <select name="iduser" id="iduser" class="form-select @error('iduser') is-invalid @enderror" required>
                                     <option value="">-- Pilih User --</option>
                                     @foreach($users as $user)
-                                        <option value="{{ $user->iduser }}" {{ old('iduser') == $user->iduser ? 'selected' : '' }}>{{ $user->nama }} ({{ $user->email }})</option>
+                                        <option value="{{ $user->id }}" {{ old('iduser') == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
                                     @endforeach
                                 </select>
                                 @error('iduser') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -73,8 +73,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const first = document.querySelector('[autofocus]'); if(first) first.focus();
     
-    // Membuat daftar user untuk pencarian
-    const users = @json($users->map(function($u){ return ['id'=>$u->iduser, 'label'=>$u->nama . ' (' . $u->email . ')']; }));
+    // Membuat daftar user untuk pencarian (gunakan kolom `id` dan `name` dari tabel `users`)
+    const users = @json($users->map(function($u){ return ['id'=>$u->id, 'label'=>$u->name . ' (' . ($u->email ?? '') . ')']; }));
     const select = document.getElementById('iduser');
     const input = document.getElementById('userSearch');
 

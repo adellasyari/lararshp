@@ -35,13 +35,13 @@ class PemilikController extends Controller
     {
         // New flow: create or link a user based on email, mirror to admin `users` table, assign Pemilik role, then create pemilik
         $data = $request->validate([
-            'nama' => ['required','string','max:255'],
+            'name' => ['required','string','max:255'],
             'email' => ['required','email','max:255'],
             'password' => ['required','string','min:6','confirmed'],
             'no_wa' => ['required','string','min:8','max:20'],
             'alamat' => ['nullable','string','max:500'],
         ],[
-            'nama.required' => 'Nama wajib diisi.',
+            'name.required' => 'Nama wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'password.required' => 'Password wajib diisi.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -50,26 +50,26 @@ class PemilikController extends Controller
 
         DB::beginTransaction();
         try {
-            // Try to find existing user in custom `user` table by email
+            // Try to find existing user in `users` table by email
             $user = User::where('email', $data['email'])->first();
 
             if (!$user) {
-                // Create in `user` table
+                // Create in `users` table
                 $user = User::create([
-                    'nama' => $data['nama'],
+                    'name' => $data['name'],
                     'email' => $data['email'],
                     'password' => Hash::make($data['password']),
                 ]);
             } else {
                 // If user exists, optionally update name/password (skip password update by default)
-                // $user->update(['nama'=>$data['nama']]);
+                // $user->update(['name'=>$data['name']]);
             }
 
             // Mirror into legacy `users` table used by admin/dokter/perawat (avoid FK issues)
             $now = now();
             DB::table('users')->insertOrIgnore([
-                'id' => $user->iduser,
-                'name' => $user->nama,
+                'id' => $user->id,
+                'name' => $user->name,
                 'email' => $user->email,
                 'password' => $user->password,
                 'created_at' => $now,
@@ -79,13 +79,13 @@ class PemilikController extends Controller
             // Ensure role_user entry for Pemilik (idrole = 5)
             $pemilikRoleId = 5;
             RoleUser::firstOrCreate([
-                'iduser' => $user->iduser,
+                'iduser' => $user->id,
                 'idrole' => $pemilikRoleId,
             ], ['status' => 1]);
 
             // Create pemilik record
             Pemilik::create([
-                'iduser' => $user->iduser,
+                'iduser' => $user->id,
                 'no_wa' => trim($data['no_wa']),
                 'alamat' => $data['alamat'] ?? null,
             ]);

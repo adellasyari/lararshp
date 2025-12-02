@@ -37,7 +37,7 @@ class TemuDokterController extends Controller
                 }
 
                 if (!empty($petIds)) {
-                    $temuDokters = TemuDokter::with(['pet', 'dokter.user', 'pemilik'])
+                    $temuDokters = TemuDokter::with(['pet', 'dokter.user'])
                         ->whereIn('idpet', $petIds)
                         ->orderBy('waktu_daftar', 'desc')
                         ->get();
@@ -46,7 +46,7 @@ class TemuDokterController extends Controller
                     $temuDokters = $pemilik->temuDokters()->with(['pet', 'dokter.user'])->orderBy('waktu_daftar', 'desc')->get();
                 } else {
                     // Fallback: query TemuDokter whose pet belongs to this pemilik
-                    $temuDokters = TemuDokter::with(['pet', 'dokter.user', 'pemilik'])
+                    $temuDokters = TemuDokter::with(['pet', 'dokter.user'])
                         ->whereHas('pet', function ($q) use ($pemilik) {
                             $q->where('idpemilik', $pemilik->idpemilik);
                         })
@@ -56,7 +56,7 @@ class TemuDokterController extends Controller
             } catch (QueryException $e) {
                 // If ordering by 'waktu_daftar' or the whereHas query fails due to
                 // schema differences, fall back to a safe in-memory filter as a last resort.
-                $all = TemuDokter::with(['pet', 'dokter.user', 'pemilik'])->get();
+                $all = TemuDokter::with(['pet', 'dokter.user'])->get();
                 $temuDokters = $all->filter(function ($t) use ($pemilik) {
                     // Try to resolve owner id via explicit column or via related pemilik/pet.
                     $ownerId = $t->idpemilik ?? ($t->pemilik->idpemilik ?? null);

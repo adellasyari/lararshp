@@ -67,7 +67,7 @@
                                 <select name="dokter_pemeriksa" id="dokter_pemeriksa" class="form-select @error('dokter_pemeriksa') is-invalid @enderror" required>
                                     <option value="">-- Pilih Dokter (Role User) --</option>
                                     @foreach($doctors as $d)
-                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa') == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->nama ?? ('Role: '.$d->role->idrole) }}</option>
+                                        <option value="{{ $d->idrole_user }}" {{ old('dokter_pemeriksa') == $d->idrole_user ? 'selected' : '' }}>{{ $d->user->name ?? ('Role: '.$d->role->idrole) }}</option>
                                     @endforeach
                                 </select>
                                 @error('dokter_pemeriksa')<div class="invalid-feedback">{{ $message }}</div>@enderror

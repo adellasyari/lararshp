@@ -66,7 +66,7 @@
                                             <td>{{ $temu->waktu ?? ($temu->waktu_daftar ? \Illuminate\Support\Carbon::parse($temu->waktu_daftar)->format('H:i') : '-') }}</td>
                                             <td>{{ $temu->no_urut ?? '-' }}</td>
                                             <td>{{ $temu->pet->nama ?? '-' }}</td>
-                                            <td>{{ $temu->dokter->user->nama ?? $temu->dokter->user->name ?? ($temu->dokter->nama ?? '-') }}</td>
+                                            <td>{{ $temu->dokter->user->name ?? ($temu->dokter->nama ?? '-') }}</td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ $tid ? route('admin.temu-dokter.edit', $tid) : '#' }}" class="btn btn-sm btn-warning">
