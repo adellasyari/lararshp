@@ -34,7 +34,8 @@
 
                             <div class="mb-3">
                                 <label for="nama" class="form-label">Nama</label>
-                                <input type="text" id="nama" class="form-control" value="{{ $user->nama }}" disabled>
+                                <input type="text" name="name" id="nama" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}">
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <!-- Email & password are managed on the user account; admin edits only profile fields here -->

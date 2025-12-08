@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 // PENTING: Tambahkan ini agar 'Pemilik::class' dikenali
 use App\Models\Pemilik;
@@ -17,7 +18,7 @@ use App\Models\Perawat;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     // --- PERUBAHAN DARI GAMBAR ---
 
@@ -35,6 +36,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'deleted_by',
     ];
 
     // The standard `users` table uses Laravel timestamps
@@ -93,6 +95,22 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'deleted_at' => 'datetime',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                // save quietly to avoid firing extra events
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
     }
 }

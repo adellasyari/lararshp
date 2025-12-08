@@ -33,7 +33,8 @@
 
                             <div class="mb-3">
                                 <label for="idpet" class="form-label">Pilih Hewan <span class="text-danger">*</span></label>
-                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required autofocus>
+                                <input type="text" id="petSearch" class="form-control mb-2" placeholder="Cari hewan (nama atau pemilik)..." autofocus>
+                                <select name="idpet" id="idpet" class="form-select @error('idpet') is-invalid @enderror" required>
                                     <option value="">-- Pilih Hewan --</option>
                                     @foreach($pets as $pet)
                                         <option value="{{ $pet->idpet }}" {{ old('idpet') == $pet->idpet ? 'selected' : '' }}>{{ $pet->nama }} - {{ $pet->pemilik->user->name ?? 'Pemilik N/A' }}</option>
@@ -44,7 +45,7 @@
 
                             <div class="mb-3">
                                 <label for="idrole_user" class="form-label">Pilih Dokter <span class="text-danger">*</span></label>
-                                <select name="idrole_user" id="idrole_user" class="form-select @error('idrole_user') is-invalid @enderror" required>
+                                <select name="idrole_user" id="idrole_user" class="form-select select2 @error('idrole_user') is-invalid @enderror" required>
                                     <option value="">-- Pilih Dokter --</option>
                                     @foreach($dokters as $dokter)
                                         <option value="{{ $dokter->idrole_user }}" {{ old('idrole_user') == $dokter->idrole_user ? 'selected' : '' }}>{{ $dokter->user->name ?? $dokter->user->name ?? 'Dokter' }}</option>
@@ -71,6 +72,26 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const first = document.querySelector('[autofocus]'); if(first) first.focus();
+
+    // Prepare pets list for client-side filtering
+    const pets = @json($pets->map(function($p){ return ['id'=>$p->idpet, 'label' => ($p->nama . ' - ' . ($p->pemilik->user->name ?? 'Pemilik N/A'))]; }));
+    const select = document.getElementById('idpet');
+    const input = document.getElementById('petSearch');
+
+    if (select && input) {
+        const render = function(filter) {
+            const current = select.value;
+            select.innerHTML = '';
+            const ph = document.createElement('option'); ph.value = ''; ph.textContent = '-- Pilih Hewan --'; select.appendChild(ph);
+            const q = (filter||'').trim().toLowerCase();
+            const list = pets.filter(o => { if(!q) return true; return o.label.toLowerCase().includes(q); });
+            list.forEach(o => {
+                const opt = document.createElement('option'); opt.value = o.id; opt.textContent = o.label; if(String(o.id)===String(current)) opt.selected = true; select.appendChild(opt);
+            });
+        };
+        render('');
+        input.addEventListener('input', function(e){ render(e.target.value); });
+    }
 });
 </script>
 @endsection

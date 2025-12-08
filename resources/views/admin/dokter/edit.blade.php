@@ -24,7 +24,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Edit Dokter</h3>
                     </div>
-                    <form action="{{ route('admin.dokter.update', $user->iduser) }}" method="POST">
+                    <form action="{{ route('admin.dokter.update', $user->getKey()) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
@@ -34,7 +34,8 @@
 
                             <div class="mb-3">
                                 <label for="nama" class="form-label">Nama</label>
-                                <input type="text" id="nama" class="form-control" value="{{ $user->nama }}" disabled>
+                                <input type="text" name="name" id="nama" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}">
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <!-- removed email & password editing: admin edits only profile fields here -->
 

@@ -63,14 +63,22 @@ class DokterController extends Controller
     /** Update (or create) dokter profile */
     public function update(Request $request)
     {
+        $user = auth()->user();
+
         $data = $request->validate([
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
             'alamat' => ['required', 'string', 'max:1000'],
             'no_hp' => ['required', 'string', 'max:30'],
             'bidang_dokter' => ['required', 'string', 'max:255'],
             'jenis_kelamin' => ['required', Rule::in(['L','P'])],
         ]);
 
-        $user = auth()->user();
+        // save user name and email first
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->save();
+
         $idUser = $user->iduser ?? $user->id;
 
         Dokter::updateOrCreate(

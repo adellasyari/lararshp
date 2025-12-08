@@ -79,14 +79,22 @@ class PerawatController extends Controller
     /** Update (or create) perawat profile */
     public function update(Request $request)
     {
+        $user = Auth::user();
+
         $data = $request->validate([
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
             'alamat' => ['required', 'string', 'max:1000'],
             'no_hp' => ['required', 'string', 'max:30'],
             'pendidikan' => ['required', 'string', 'max:255'],
             'jenis_kelamin' => ['required', Rule::in(['L','P'])],
         ]);
 
-        $user = Auth::user();
+        // update user name/email
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->save();
+
         $idUser = $user->iduser ?? $user->id;
 
         Perawat::updateOrCreate(

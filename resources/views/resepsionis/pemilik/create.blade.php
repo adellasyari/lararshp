@@ -32,9 +32,9 @@
                             @endif
 
                             <div class="mb-3">
-                                <label for="nama" class="form-label">Nama Pemilik <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama') }}" placeholder="Nama lengkap" required>
-                                @error('nama') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label for="name" class="form-label">Nama Pemilik <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Nama lengkap" required>
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="mb-3">

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pemilik extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     // 1. Menentukan nama tabel
     protected $table = 'pemilik';
@@ -21,11 +22,30 @@ class Pemilik extends Model
     protected $fillable = [
         'no_wa',
         'alamat',
-        'iduser' // Foreign key ke tabel user
+        'iduser', // Foreign key ke tabel user
+        'deleted_by',
     ];
 
     // Non-aktifkan timestamps jika tabel tidak memiliki kolom created_at/updated_at
     public $timestamps = false;
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
+    }
 
     /**
      * 4. Mendefinisikan relasi kebalikannya: "Satu Pemilik DIMILIKI OLEH satu User"

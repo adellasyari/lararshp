@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Perawat extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /** Nama tabel (ubah jika berbeda) */
     protected $table = 'perawat';
@@ -31,11 +32,30 @@ class Perawat extends Model
         'jenis_kelamin',
         'pendidikan',
         'id_user',
+        'deleted_by',
     ];
 
     /** Relasi ke User */
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
+    }
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
     }
 }

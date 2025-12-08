@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DetailRekamMedis extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'detail_rekam_medis';
     protected $primaryKey = 'iddetail_rekam_medis';
     public $timestamps = false;
@@ -14,6 +17,11 @@ class DetailRekamMedis extends Model
         'idrekam_medis',
         'idkode_tindakan_terapi',
         'detail',
+        'deleted_by',
+    ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     public function rekamMedis()
@@ -24,5 +32,19 @@ class DetailRekamMedis extends Model
     public function tindakan()
     {
         return $this->belongsTo(TindakanTerapi::class, 'idkode_tindakan_terapi', 'idkode_tindakan_terapi');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RekamMedis extends Model
 {
+    use SoftDeletes;
     protected $table = 'rekam_medis';
     protected $primaryKey = 'idrekam_medis';
     public $incrementing = true;
@@ -23,6 +25,24 @@ class RekamMedis extends Model
 
     // Table only has created_at (no updated_at), so disable automatic timestamps
     public $timestamps = false;
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
+    }
 
     public function pet()
     {

@@ -66,11 +66,7 @@
                             <dt class="col-sm-5">Jenis Hewan</dt>
                             <dd class="col-sm-7">{{ $ras->jenisHewan->nama_jenis_hewan ?? '-' }}</dd>
 
-                            <dt class="col-sm-5">Dibuat</dt>
-                            <dd class="col-sm-7">{{ optional($ras->created_at)->format('d M Y H:i') ?? '-' }}</dd>
-
-                            <dt class="col-sm-5">Terakhir diubah</dt>
-                            <dd class="col-sm-7">{{ optional($ras->updated_at)->format('d M Y H:i') ?? '-' }}</dd>
+                            
                         </dl>
                     </div>
                 </div>

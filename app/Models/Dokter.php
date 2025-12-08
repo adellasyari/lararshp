@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Dokter extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /** Nama tabel (ubah jika berbeda) */
     protected $table = 'dokter';
@@ -31,7 +32,26 @@ class Dokter extends Model
         'bidang_dokter',
         'jenis_kelamin',
         'id_user',
+        'deleted_by',
     ];
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
+    }
 
     /** Relasi ke User */
     public function user()

@@ -106,18 +106,7 @@
           </div>
         </div>
         
-        <div class="card card-secondary">
-          <div class="card-header">
-            <h3 class="card-title">Riwayat Data</h3>
-          </div>
-          <div class="card-body">
-            <small class="text-muted">
-              <strong>ID:</strong> {{ $jenisHewan->idjenis_hewan }}<br>
-              <strong>Dibuat:</strong> {{ $jenisHewan->created_at ? $jenisHewan->created_at->format('d/m/Y H:i') : '-' }}<br>
-              <strong>Diupdate:</strong> {{ $jenisHewan->updated_at ? $jenisHewan->updated_at->format('d/m/Y H:i') : '-' }}
-            </small>
-          </div>
-        </div>
+        
       </div>
     </div>
     <!--end::Row-->

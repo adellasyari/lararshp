@@ -117,6 +117,7 @@ class PerawatController extends Controller
 
         // Validate only profile fields — email/password are not edited here
         $request->validate([
+            'name' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:500',
             'no_hp' => 'nullable|string|max:50',
             'pendidikan' => 'nullable|string|max:255',
@@ -125,8 +126,13 @@ class PerawatController extends Controller
 
         DB::beginTransaction();
         try {
-            // update or create perawat profile
-            $perawat = Perawat::firstOrNew(['id_user' => $user->iduser]);
+            // first update user's name
+            $user->name = $request->input('name');
+            $user->save();
+
+            // update or create perawat profile (use current user id)
+            $perawat = Perawat::firstOrNew(['id_user' => $user->id]);
+            // if model requires explicit primary key when creating, let Eloquent handle it.
             $perawat->alamat = $request->input('alamat');
             $perawat->no_hp = $request->input('no_hp');
             $perawat->pendidikan = $request->input('pendidikan');
@@ -137,7 +143,7 @@ class PerawatController extends Controller
             return redirect()->route('admin.perawat.index')->with('success', 'Data perawat berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Failed to update perawat profile', ['iduser' => $user->iduser, 'error' => $e->getMessage()]);
+            Log::error('Failed to update perawat profile', ['id' => $user->id, 'error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal memperbarui data perawat: ' . $e->getMessage());
         }
     }

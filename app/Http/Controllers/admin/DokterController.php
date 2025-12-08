@@ -113,11 +113,20 @@ class DokterController extends Controller
     {
         $user = User::findOrFail($id);
         $request->validate([
+            'name' => 'required|string|max:255',
             'alamat' => 'nullable|string|max:500',
             'no_hp' => 'nullable|string|max:50',
             'bidang_dokter' => 'nullable|string|max:255',
             'jenis_kelamin' => 'nullable|string|max:10',
         ]);
+
+        // Update user's name first
+        $user->name = $request->input('name');
+        try {
+            $user->save();
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Gagal update nama pengguna: '.$e->getMessage());
+        }
 
         // update dokter profile fields
         $dokter = Dokter::firstOrNew(['id_user' => $user->id]);

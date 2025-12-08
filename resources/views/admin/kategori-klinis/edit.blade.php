@@ -81,16 +81,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-secondary mt-2">
-                    <div class="card-header"><h3 class="card-title">Riwayat Data</h3></div>
-                    <div class="card-body">
-                        <small class="text-muted">
-                            <strong>ID:</strong> {{ $kategoriKlinis->getKey() }}<br>
-                            <strong>Dibuat:</strong> {{ $kategoriKlinis->created_at ? $kategoriKlinis->created_at->format('d/m/Y H:i') : '-' }}<br>
-                            <strong>Diupdate:</strong> {{ $kategoriKlinis->updated_at ? $kategoriKlinis->updated_at->format('d/m/Y H:i') : '-' }}
-                        </small>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

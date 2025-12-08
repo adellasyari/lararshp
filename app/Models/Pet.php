@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 // 1. Ubah nama class menjadi Pet
 class Pet extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     // 2. Sesuaikan nama tabel
     protected $table = 'pet';
@@ -24,10 +25,29 @@ class Pet extends Model
         'jenis_kelamin',
         'idpemilik',
         'idras_hewan' // <-- Pastikan nama foreign key benar
+        ,'deleted_by',
     ];
 
     // Non-aktifkan timestamps jika tabel tidak memiliki created_at/updated_at
     public $timestamps = false;
+
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            if (auth()->check()) {
+                $model->deleted_by = auth()->id();
+                if (method_exists($model, 'saveQuietly')) {
+                    $model->saveQuietly();
+                } else {
+                    $model->save();
+                }
+            }
+        });
+    }
 
     /**
      * Relasi: "Satu Pet DIMILIKI OLEH satu Pemilik"

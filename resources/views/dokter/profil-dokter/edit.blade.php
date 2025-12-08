@@ -28,13 +28,15 @@
                             @csrf
 
                             <div class="mb-3">
-                                <label class="form-label">Nama</label>
-                                <input type="text" class="form-control" value="{{ $user->name ?? $user->email }}" disabled>
+                                <label for="name" class="form-label">Nama</label>
+                                <input id="name" name="name" type="text" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name ?? $user->email) }}">
+                                @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="{{ $user->email }}" disabled>
+                                <label for="email" class="form-label">Email</label>
+                                <input id="email" name="email" type="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}">
+                                @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
                             <div class="mb-3">
