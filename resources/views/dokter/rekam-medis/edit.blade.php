@@ -33,22 +33,34 @@
                             <p class="text-muted">Dokter hanya dapat menambahkan atau mengubah <strong>Tindakan Terapi</strong> dan <strong>Detail</strong>. Informasi lain bersifat read-only.</p>
 
                             <div class="mb-3">
-                                <label for="idkode_tindakan_terapi" class="form-label">Tindakan Terapi <span class="text-danger">(opsional)</span></label>
-                                <select name="idkode_tindakan_terapi" id="idkode_tindakan_terapi" class="form-select @error('idkode_tindakan_terapi') is-invalid @enderror">
-                                    <option value="">-- Pilih Tindakan --</option>
-                                    @if(isset($tindakanTerapis) && $tindakanTerapis->count())
-                                        @foreach($tindakanTerapis as $t)
-                                            <option value="{{ $t->idkode_tindakan_terapi }}" {{ old('idkode_tindakan_terapi', $selectedTindakan ?? '') == $t->idkode_tindakan_terapi ? 'selected' : '' }}>{{ $t->kode }} - {{ $t->deskripsi_tindakan_terapi }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                @error('idkode_tindakan_terapi')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label class="form-label">Tindakan Terapi (opsional)</label>
+                                <div id="tindakan-rows">
+                                    <div class="tindakan-row mb-2 d-flex gap-2">
+                                        <select name="idkode_tindakan_terapi[]" class="form-select flex-grow-1 @error('idkode_tindakan_terapi') is-invalid @enderror">
+                                            <option value="">-- Pilih Tindakan --</option>
+                                            @if(isset($tindakanTerapis) && $tindakanTerapis->count())
+                                                @foreach($tindakanTerapis as $t)
+                                                    <option value="{{ $t->idkode_tindakan_terapi }}">{{ $t->kode }} - {{ $t->deskripsi_tindakan_terapi }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <button type="button" class="btn btn-danger btn-sm btn-remove-row" style="display:none;">&times;</button>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" id="btn-add-row" class="btn btn-sm btn-primary">+ Tambah Baris</button>
+                                </div>
+                                @error('idkode_tindakan_terapi')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="detail" class="form-label">Detail Tindakan</label>
-                                <textarea name="detail" id="detail" class="form-control @error('detail') is-invalid @enderror" rows="4">{{ old('detail') }}</textarea>
-                                @error('detail')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <label for="detail" class="form-label">Detail Tindakan (sesuaikan per baris)</label>
+                                <div id="detail-rows">
+                                    <div class="detail-row mb-2">
+                                        <textarea name="detail[]" class="form-control @error('detail') is-invalid @enderror" rows="2">{{ old('detail.0') }}</textarea>
+                                    </div>
+                                </div>
+                                @error('detail')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                         </div>
                         <div class="card-footer">
@@ -76,8 +88,7 @@
                             <dt class="col-sm-5">Ras / Jenis</dt>
                             <dd class="col-sm-7" id="info-rasjenis">{{ optional(optional($rekamMedis->pet)->rasHewan)->nama_ras ?? '-' }} / {{ optional(optional(optional($rekamMedis->pet)->rasHewan)->jenisHewan)->nama_jenis_hewan ?? '-' }}</dd>
 
-                            <dt class="col-sm-5">Dokter</dt>
-                            <dd class="col-sm-7" id="info-dokter">{{ optional(optional($rekamMedis->roleUser)->user)->name ?? optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-') }}</dd>
+                            {{-- Dokter info removed per request --}}
 
                             <dt class="col-sm-5">Dibuat</dt>
                             <dd class="col-sm-7" id="info-created">{{ $rekamMedis->created_at ? \Carbon\Carbon::parse($rekamMedis->created_at)->format('d M Y H:i') : '-' }}</dd>
@@ -95,6 +106,44 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() { const first = document.querySelector('[autofocus]'); if(first) first.focus(); });
+document.addEventListener('DOMContentLoaded', function() {
+    const first = document.querySelector('[autofocus]'); if(first) first.focus();
+
+    const btnAdd = document.getElementById('btn-add-row');
+    const tindakanRows = document.getElementById('tindakan-rows');
+    const detailRows = document.getElementById('detail-rows');
+
+    btnAdd.addEventListener('click', function() {
+        // clone a new tindakan row
+        const template = document.querySelector('.tindakan-row');
+        const newRow = template.cloneNode(true);
+        // show remove button
+        const removeBtn = newRow.querySelector('.btn-remove-row');
+        removeBtn.style.display = 'inline-block';
+        removeBtn.addEventListener('click', function(){ newRow.remove(); syncDetailRows(); });
+        // clear select value
+        const sel = newRow.querySelector('select'); sel.value = '';
+        tindakanRows.appendChild(newRow);
+
+        // add corresponding detail textarea
+        const detailTemplate = document.querySelector('.detail-row');
+        const newDetail = detailTemplate.cloneNode(true);
+        newDetail.querySelector('textarea').value = '';
+        detailRows.appendChild(newDetail);
+    });
+
+    // when removing a tindakan via its own remove button we already remove corresponding detail via sync
+    function syncDetailRows(){
+        // ensure number of detail rows matches tindakan rows
+        const tCount = tindakanRows.querySelectorAll('.tindakan-row').length;
+        const dNodes = detailRows.querySelectorAll('.detail-row');
+        while (dNodes.length > tCount) { detailRows.removeChild(detailRows.lastElementChild); }
+        while (dNodes.length < tCount) {
+            const clone = dNodes[0].cloneNode(true);
+            clone.querySelector('textarea').value = '';
+            detailRows.appendChild(clone);
+        }
+    }
+});
 </script>
 @endsection

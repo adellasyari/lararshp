@@ -140,11 +140,11 @@ class UserController extends Controller
                         Log::info('Deleting TemuDokter for pet', ['idpet' => $pet->idpet]);
                         TemuDokter::where('idpet', $pet->idpet)->delete();
 
-                        Log::info('Deleting Pet record', ['idpet' => $pet->idpet]);
+                        Log::info('Deleting Pet record (soft delete)', ['idpet' => $pet->idpet]);
                         $pet->delete();
                 }
 
-                Log::info('Deleting Pemilik record', ['idpemilik' => $pemilik->idpemilik]);
+                Log::info('Deleting Pemilik record (soft delete)', ['idpemilik' => $pemilik->idpemilik]);
                 $pemilik->delete();
             }
 

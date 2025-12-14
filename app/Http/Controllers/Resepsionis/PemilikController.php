@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\RekamMedis;
 use App\Models\TemuDokter;
+use App\Models\Pet;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -152,17 +153,17 @@ class PemilikController extends Controller
                     DB::table('detail_rekam_medis')->whereIn('idrekam_medis', $rekamIds)->delete();
                 }
 
-                // Hapus rekam_medis untuk pet ini
+                // Hapus rekam_medis untuk pet ini via Eloquent (soft delete)
                 RekamMedis::whereIn('idpet', $petIds)->delete();
 
-                // Hapus temu_dokter untuk pet ini
+                // Hapus temu_dokter untuk pet ini via Eloquent (soft delete)
                 TemuDokter::whereIn('idpet', $petIds)->delete();
 
-                // Hapus data pet
-                DB::table('pet')->whereIn('idpet', $petIds)->delete();
+                // Hapus data pet via Eloquent (soft delete)
+                Pet::whereIn('idpet', $petIds)->delete();
             }
 
-            // Hapus pemilik
+            // Hapus record pemilik via Eloquent (soft delete)
             $pemilik->delete();
 
             // Hapus akun login terkait jika ada
@@ -170,10 +171,10 @@ class PemilikController extends Controller
                 // Hapus entri role_user terkait
                 RoleUser::where('iduser', $idUser)->delete();
 
-                // Hapus dari tabel users legacy jika ada
-                DB::table('users')->where('id', $idUser)->delete();
+                // Hapus entri role_user terkait
+                RoleUser::where('iduser', $idUser)->delete();
 
-                // Hapus user
+                // Soft-delete user model (jika ada) instead of hard-deleting via DB to avoid FK cascade
                 $user = User::find($idUser);
                 if ($user) {
                     $user->delete();

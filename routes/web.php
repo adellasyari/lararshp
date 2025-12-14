@@ -264,6 +264,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('isPemilik')->group(function () {
         Route::get('/pemilik/dashboard', [App\Http\Controllers\Pemilik\DashboardController::class, 'index'])->name('pemilik.dashboard');
         Route::get('/pemilik/profile', [App\Http\Controllers\Pemilik\PemilikController::class, 'profile'])->name('pemilik.profile');
+        Route::get('/pemilik/profile/edit', [App\Http\Controllers\Pemilik\PemilikController::class, 'edit'])->name('pemilik.edit');
+        Route::post('/pemilik/profile/update', [App\Http\Controllers\Pemilik\PemilikController::class, 'update'])->name('pemilik.update');
         Route::get('/pemilik/pet', [App\Http\Controllers\Pemilik\PetController::class, 'index'])->name('pemilik.pet.index');
         Route::get('/pemilik/rekam-medis', [App\Http\Controllers\Pemilik\RekamMedisController::class, 'index'])->name('pemilik.rekam-medis.index');
         // Pemilik - Temu Dokter (lihat jadwal kunjungan)

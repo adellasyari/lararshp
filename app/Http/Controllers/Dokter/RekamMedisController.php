@@ -7,8 +7,10 @@ use App\Models\RekamMedis;
 use App\Models\Pet;
 use App\Models\RoleUser;
 use App\Models\TindakanTerapi;
+use App\Models\TemuDokter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RekamMedisController extends Controller
 {
@@ -17,28 +19,59 @@ class RekamMedisController extends Controller
      */
     public function index()
     {
-        // Provide patient queue and rekam medis list similar to Perawat view
-        // Order pets so those with the most recent rekam_medis appear first.
-        $orderedPetIds = DB::table('pet as p')
-            ->leftJoin('rekam_medis as rm', 'p.idpet', '=', 'rm.idpet')
-            ->select('p.idpet', DB::raw('MAX(rm.created_at) as last_rekam'))
-            ->groupBy('p.idpet')
-            ->orderByDesc('last_rekam')
-            ->orderBy('p.nama')
-            ->pluck('idpet')
-            ->toArray();
+        // Determine authenticated dokter's role_user id
+        $user = auth()->user();
+        $roleUser = \App\Models\RoleUser::where('iduser', $user->iduser ?? $user->id)
+            ->whereHas('role', function($q){ $q->where('nama_role','Dokter'); })
+            ->where('status', 1)
+            ->first();
 
-        $petsCollection = Pet::with('pemilik.user', 'rasHewan.jenisHewan')
-            ->whereIn('idpet', $orderedPetIds)
-            ->get()
-            ->keyBy('idpet');
+        $roleUserId = $roleUser->idrole_user ?? null;
 
-        $pets = collect($orderedPetIds)->map(function($id) use ($petsCollection) {
-            return $petsCollection->get($id);
-        })->filter()->values();
+        // If no associated RoleUser (not a dokter), return empty collections
+        if (! $roleUserId) {
+            $pets = collect();
+            $rekamMediss = collect();
+            return view('dokter.rekam-medis.index', compact('pets', 'rekamMediss'));
+        }
+
+        // Only include rekam medis assigned to this dokter
         $rekamMediss = RekamMedis::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan', 'roleUser.user'])
+            ->where('dokter_pemeriksa', $roleUserId)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // Build today's appointment queue (antrian) for this dokter only
+        $antrianHariIni = TemuDokter::with(['pet.pemilik.user', 'pet.rasHewan.jenisHewan'])
+            ->where('idrole_user', $roleUserId)
+            ->whereDate('waktu_daftar', now()->toDateString())
+            ->where('status', TemuDokter::STATUS_MENUNGGU)
+            ->orderBy('no_urut')
+            ->get();
+
+        // If there are appointments for today, show those pets as the "antrian" list.
+        // Otherwise fall back to pets derived from rekam medis assigned to this dokter.
+        if ($antrianHariIni->isNotEmpty()) {
+            $orderedPetIds = $antrianHariIni->pluck('idpet')->unique()->values()->all();
+            $petsCollection = Pet::with('pemilik.user', 'rasHewan.jenisHewan')
+                ->whereIn('idpet', $orderedPetIds)
+                ->get()
+                ->keyBy('idpet');
+
+            $pets = collect($orderedPetIds)->map(function($id) use ($petsCollection) {
+                return $petsCollection->get($id);
+            })->filter()->values();
+        } else {
+            $orderedPetIds = collect($rekamMediss)->pluck('idpet')->unique()->values()->all();
+            $petsCollection = Pet::with('pemilik.user', 'rasHewan.jenisHewan')
+                ->whereIn('idpet', $orderedPetIds)
+                ->get()
+                ->keyBy('idpet');
+
+            $pets = collect($orderedPetIds)->map(function($id) use ($petsCollection) {
+                return $petsCollection->get($id);
+            })->filter()->values();
+        }
 
         return view('dokter.rekam-medis.index', compact('pets', 'rekamMediss'));
     }
@@ -221,8 +254,10 @@ class RekamMedisController extends Controller
     {
         // For dokter: only allow updating tindakan/detail (do not modify main rekam_medis fields)
         $data = $request->validate([
-            'idkode_tindakan_terapi' => 'nullable|exists:kode_tindakan_terapi,idkode_tindakan_terapi',
-            'detail' => 'nullable|string',
+            'idkode_tindakan_terapi' => 'nullable|array',
+            'idkode_tindakan_terapi.*' => 'nullable|exists:kode_tindakan_terapi,idkode_tindakan_terapi',
+            'detail' => 'nullable|array',
+            'detail.*' => 'nullable|string',
         ]);
 
         // Resolve rekam id robustly. If binding produced an empty model, try to
@@ -240,12 +275,34 @@ class RekamMedisController extends Controller
 
         // Replace existing tindakan rows for this rekam_medis with the submitted one (or none)
         DB::table('detail_rekam_medis')->where('idrekam_medis', $rekamId)->delete();
-        if ($request->filled('idkode_tindakan_terapi')) {
-            DB::table('detail_rekam_medis')->insert([
-                'idrekam_medis' => $rekamId,
-                'idkode_tindakan_terapi' => $request->input('idkode_tindakan_terapi'),
-                'detail' => $request->input('detail'),
-            ]);
+        $tindakanIds = $request->input('idkode_tindakan_terapi', []);
+        $details = $request->input('detail', []);
+        $inserts = [];
+        if (is_array($tindakanIds) && count($tindakanIds)) {
+            foreach ($tindakanIds as $idx => $kodeId) {
+                if (empty($kodeId)) continue;
+                $inserts[] = [
+                    'idrekam_medis' => $rekamId,
+                    'idkode_tindakan_terapi' => $kodeId,
+                    'detail' => $details[$idx] ?? null,
+                ];
+            }
+        }
+
+        if (!empty($inserts)) {
+            DB::table('detail_rekam_medis')->insert($inserts);
+        }
+
+        // After Dokter saves tindakan/diagnosa, mark any waiting appointment for this pet as finished.
+        try {
+            $rekam = RekamMedis::find($rekamId);
+            if ($rekam && $rekam->idpet) {
+                TemuDokter::where('idpet', $rekam->idpet)
+                    ->where('status', TemuDokter::STATUS_MENUNGGU)
+                    ->update(['status' => TemuDokter::STATUS_SELESAI]);
+            }
+        } catch (\Exception $e) {
+            Log::warning('[Dokter\\RekamMedis@update] failed to update TemuDokter status', ['err' => $e->getMessage()]);
         }
 
         return redirect()->route('dokter.rekam-medis.show', ['rekam_medi' => $rekamId])->with('success', 'Tindakan rekam medis berhasil disimpan.');

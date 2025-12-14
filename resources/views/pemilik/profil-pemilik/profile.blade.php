@@ -22,7 +22,10 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header"><h5 class="mb-0">Detail Profil</h5></div>
+                    <div class="card-header">
+                        <h5 class="mb-0">Detail Profil</h5>
+                        <a href="{{ route('pemilik.edit') }}" class="btn btn-primary btn-sm float-end">Edit Profil</a>
+                    </div>
                     <div class="card-body">
                         <dl class="row mb-0">
                             <dt class="col-sm-3">Nama</dt>

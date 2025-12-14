@@ -75,8 +75,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                                 <div>
-                                    <label class="me-3"><input type="radio" name="jenis_kelamin" value="L" {{ old('jenis_kelamin') == 'L' ? 'checked' : '' }}> Laki-laki</label>
-                                    <label><input type="radio" name="jenis_kelamin" value="P" {{ old('jenis_kelamin') == 'P' ? 'checked' : '' }}> Perempuan</label>
+                                    <label class="me-3"><input type="radio" name="jenis_kelamin" value="J" {{ old('jenis_kelamin') == 'J' ? 'checked' : '' }}> Jantan</label>
+                                    <label><input type="radio" name="jenis_kelamin" value="B" {{ old('jenis_kelamin') == 'B' ? 'checked' : '' }}> Betina</label>
                                 </div>
                                 @error('jenis_kelamin')<div class="text-danger">{{ $message }}</div>@enderror
                             </div>

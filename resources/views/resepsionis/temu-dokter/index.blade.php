@@ -82,8 +82,8 @@
                                                         @php $s = (string)($item->status ?? ''); @endphp
                                                         @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)
                                                             <span class="badge bg-warning text-dark">Menunggu</span>
-                                                        @elseif($s === \App\Models\TemuDokter::STATUS_DIPERIKSA)
-                                                            <span class="badge bg-success">Diperiksa</span>
+                                                        @elseif($s === \App\Models\TemuDokter::STATUS_SELESAI)
+                                                            <span class="badge bg-success">Selesai</span>
                                                         @else
                                                             <span class="badge bg-secondary">{{ $item->status_label }}</span>
                                                         @endif
@@ -147,8 +147,8 @@
                                                 @php $s = (string)($r->status ?? ''); @endphp
                                                 @if($s === \App\Models\TemuDokter::STATUS_MENUNGGU)
                                                     <span class="badge bg-warning text-dark">Menunggu</span>
-                                                @elseif($s === \App\Models\TemuDokter::STATUS_DIPERIKSA)
-                                                    <span class="badge bg-primary">Diperiksa</span>
+                                                @elseif($s === \App\Models\TemuDokter::STATUS_SELESAI)
+                                                    <span class="badge bg-primary">Selesai</span>
                                                 @else
                                                     <span class="badge bg-secondary">{{ $r->status_label }}</span>
                                                 @endif

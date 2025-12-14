@@ -135,17 +135,9 @@ class RekamMedisController extends Controller
 
         // Jika ada pendaftaran temu dokter terkait (berdasarkan pet yang sama dan status menunggu),
         // tandai bahwa perawat telah memeriksa pasien sehingga antrean masuk ke dokter.
-        try {
-            // Mark any matching waiting reservations as "Diperiksa" (do not attempt to write
-            // `idrekam_medis` because the `temu_dokter` table does not have that column).
-            TemuDokter::where('idpet', $rekam->idpet)
-                ->where('status', TemuDokter::STATUS_MENUNGGU)
-                ->update([
-                    'status' => TemuDokter::STATUS_DIPERIKSA,
-                ]);
-        } catch (\Exception $e) {
-            // Do not fail creation of RekamMedis if updating temu_dokter fails; keep silent.
-        }
+        // NOTE: status on `temu_dokter` should not be changed here. Perawat
+        // only creates/updates RekamMedis; the appointment status remains
+        // 'Menunggu' until the Dokter completes the diagnosis.
 
         // persist selected tindakan if provided
         if ($request->filled('idkode_tindakan_terapi')) {
@@ -239,23 +231,22 @@ class RekamMedisController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, RekamMedis $rekamMedis)
+    public function update(Request $request, $id)
     {
+        $rekamMedis = RekamMedis::findOrFail($id);
+
         $data = $request->validate([
-            'tanggal' => 'required|date',
             'anamnesa' => 'required|string',
             'diagnosa' => 'required|string',
             'temuan_klinis' => 'required|string',
-            'idpet' => 'required|exists:pet,idpet',
-            'dokter_pemeriksa' => 'nullable|exists:role_user,idrole_user',
         ]);
 
-        $dateOnly = $data['tanggal'];
-        $currentTime = Carbon::now()->format('H:i:s');
-        $data['created_at'] = Carbon::parse($dateOnly . ' ' . $currentTime)->toDateTimeString();
-        unset($data['tanggal']);
-
-        $rekamMedis->update($data);
+        // Only update the specified fields; do not change tanggal/idpet/dokter here.
+        $rekamMedis->update([
+            'anamnesa' => $data['anamnesa'],
+            'temuan_klinis' => $data['temuan_klinis'],
+            'diagnosa' => $data['diagnosa'],
+        ]);
 
         // update detail_rekam_medis: remove existing and insert new if provided
         DB::table('detail_rekam_medis')->where('idrekam_medis', $rekamMedis->idrekam_medis)->delete();

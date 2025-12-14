@@ -54,7 +54,8 @@ class PetController extends Controller
             'nama' => ['required','string','min:2','max:255'],
             'tanggal_lahir' => ['nullable','date'],
             'warna_tanda' => ['nullable','string','max:255'],
-            'jenis_kelamin' => ['required','in:L,P'],
+            // Accept new J/B codes for animals; keep legacy L/P during transition
+            'jenis_kelamin' => ['required','in:J,B,L,P'],
             'idpemilik' => ['required','exists:pemilik,idpemilik'],
             'idras_hewan' => ['required','exists:ras_hewan,idras_hewan'],
         ],[

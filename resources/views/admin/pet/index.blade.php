@@ -59,7 +59,16 @@
                                     <td>{{ $item->rasHewan->nama_ras ?? $item->rasHewan->nama_ras_hewan ?? 'Ras Dihapus' }}</td>
                                     <td>{{ $item->tanggal_lahir }}</td>
                                     <td>{{ $item->warna_tanda }}</td>
-                                    <td>{{ $item->jenis_kelamin }}</td>
+                                    <td>
+                                        @php $jk = $item->jenis_kelamin ?? ''; @endphp
+                                        @if($jk === 'J' || $jk === 'L')
+                                            Jantan
+                                        @elseif($jk === 'B' || $jk === 'P')
+                                            Betina
+                                        @else
+                                            {{ $jk }}
+                                        @endif
+                                    </td>
                                     <td>
                                         @php $key = method_exists($item, 'getKey') ? $item->getKey() : ($item->idpet ?? null); @endphp
                                         @if(!empty($key))

@@ -30,15 +30,11 @@
                         <div class="card-body">
                             @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
-                            <div class="mb-3">
-                                <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror" value="{{ old('tanggal', optional($rekamMedis->created_at)->format('Y-m-d')) }}" required autofocus>
-                                @error('tanggal')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            {{-- Tanggal dihapus: Perubahan hanya untuk anamnesa, temuan klinis, dan diagnosa --}}
 
                             <div class="mb-3">
                                 <label for="anamnesa" class="form-label">Anamnesa <span class="text-danger">*</span></label>
-                                <textarea name="anamnesa" id="anamnesa" class="form-control @error('anamnesa') is-invalid @enderror" required>{{ old('anamnesa', $rekamMedis->anamnesa) }}</textarea>
+                                <textarea name="anamnesa" id="anamnesa" class="form-control @error('anamnesa') is-invalid @enderror" required autofocus>{{ old('anamnesa', $rekamMedis->anamnesa) }}</textarea>
                                 @error('anamnesa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
@@ -81,8 +77,7 @@
                             <dt class="col-sm-5">Ras / Jenis</dt>
                             <dd class="col-sm-7" id="info-rasjenis">{{ optional(optional($rekamMedis->pet)->rasHewan)->nama_ras ?? '-' }} / {{ optional(optional(optional($rekamMedis->pet)->rasHewan)->jenisHewan)->nama_jenis_hewan ?? '-' }}</dd>
 
-                            <dt class="col-sm-5">Dokter</dt>
-                            <dd class="col-sm-7" id="info-dokter">{{ optional(optional($rekamMedis->roleUser)->user)->name ?? optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-') }}</dd>
+                            {{-- Dokter info removed per request --}}
 
                             <dt class="col-sm-5">Dibuat</dt>
                             <dd class="col-sm-7" id="info-created">{{ $rekamMedis->created_at ? \Carbon\Carbon::parse($rekamMedis->created_at)->format('d M Y H:i') : '-' }}</dd>

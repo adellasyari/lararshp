@@ -116,8 +116,7 @@
 							<dt class="col-sm-4">Nama Pemilik</dt>
 							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional(optional(optional($rekamMedis->pet)->pemilik)->user)->name ?? (optional(optional($rekamMedis->pet)->pemilik)->nama ?? '-') ) : (isset($petSelected) ? (optional(optional($petSelected->pemilik)->user)->name ?? (optional($petSelected->pemilik)->nama ?? '-')) : '-') }}</dd>
 
-							<dt class="col-sm-4">Dokter Pemeriksa</dt>
-							<dd class="col-sm-8">{{ isset($rekamMedis) ? (optional(optional($rekamMedis->roleUser)->user)->name ?? (optional($rekamMedis->dokter)->nama ?? ($rekamMedis->dokter_pemeriksa ?? '-'))) : '-' }}</dd>
+
 						</dl>
 					</div>
 				</div>

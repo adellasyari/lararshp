@@ -26,8 +26,14 @@ class TemuDokterController extends Controller
         // Filter using the database's date values directly (show times exactly as stored in DB)
         $antrianHariIni = TemuDokter::with(['dokter.user', 'pet.pemilik.user', 'pet.rasHewan'])
             ->whereDate('waktu_daftar', Carbon::today())
-            ->orderBy('waktu_daftar', 'asc')
+            ->where(function($q) {
+                // include records that are still waiting: explicit '0', NULL or empty string
+                $q->where('status', TemuDokter::STATUS_MENUNGGU)
+                  ->orWhereNull('status')
+                  ->orWhere('status', '');
+            })
             ->orderBy('no_urut', 'asc')
+            ->orderBy('waktu_daftar', 'asc')
             ->get();
 
         Log::info('[TemuDokter@index] antrianHariIni fetched (db-date)', [
@@ -90,18 +96,12 @@ class TemuDokterController extends Controller
             'idrole_user' => ['required','integer','exists:role_user,idrole_user'],
             'idpet' => ['required','integer','exists:pet,idpet'],
         ]);
+        // Force waktu_daftar to current server time (real-time) regardless of form input
+        // Use Carbon::now() (server default timezone) to ensure the DB stores the actual server timestamp.
+        $waktu_daftar_dt = Carbon::now();
+        $waktu_daftar = $waktu_daftar_dt->toDateTimeString();
 
-        // Determine timezone to use for 'local' times. Default to Jakarta if app timezone unset.
-        $tz = config('app.timezone') ?: 'Asia/Jakarta';
-
-        // Fill waktu_daftar with current server/app time (local to $tz). Store as UTC in DB
-        // so stored timestamps are consistent regardless of server timezone.
-        $waktu_daftar_dt = Carbon::now($tz);
-        $waktu_daftar_db = $waktu_daftar_dt->copy()->setTimezone('UTC')->format('Y-m-d H:i:s');
-        // Keep the local datetime object for computing the per-day sequence
-        $waktu_daftar = $waktu_daftar_dt->format('Y-m-d H:i:s');
-
-        // compute next no_urut for the same date (per-day sequence)
+        // compute next no_urut for the same date (per-day sequence) based on server date
         $dateOnly = $waktu_daftar_dt->toDateString();
         $maxForDate = TemuDokter::whereDate('waktu_daftar', $dateOnly)->max('no_urut');
         $nextNo = ($maxForDate ? (int)$maxForDate : 0) + 1;
@@ -121,20 +121,11 @@ class TemuDokterController extends Controller
         }
 
         $created = null;
-        DB::transaction(function() use ($data, $waktu_daftar, $waktu_daftar_db, $nextNo, &$created) {
-            // ensure MySQL session timezone is UTC so TIMESTAMP values are stored consistently
-            try {
-                DB::statement("SET time_zone = '+00:00'");
-            } catch (\Exception $e) {
-                // Log but continue; some environments may not allow changing session timezone
-                Log::warning('[TemuDokter@store] could not set session time_zone', ['err' => $e->getMessage()]);
-            }
-            // Note: the `temu_dokter` table in the current DB schema does NOT have an `idpemilik` column,
-            // so we only insert `idpet` and derive owner from the pet relationship when needed.
+        DB::transaction(function() use ($data, $waktu_daftar, $nextNo, &$created) {
+            // Force waktu_daftar into the created row using server time
             $created = TemuDokter::create([
                 'idpet' => $data['idpet'],
-                // store UTC timestamp in DB
-                'waktu_daftar' => $waktu_daftar_db,
+                'waktu_daftar' => $waktu_daftar,
                 'idrole_user' => $data['idrole_user'],
                 'no_urut' => $nextNo,
                 'status' => 0,

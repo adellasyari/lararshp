@@ -66,7 +66,7 @@ class TemuDokter extends Model
 
     // Status constants matching database values (two-state workflow)
     const STATUS_MENUNGGU = '0';
-    const STATUS_DIPERIKSA = '1';
+    const STATUS_SELESAI = '1';
 
     /**
      * Accessor: human readable status label.
@@ -82,8 +82,8 @@ class TemuDokter extends Model
         if ($s === null || $s === '') {
             return 'Menunggu';
         }
-        if ((string)$s === self::STATUS_DIPERIKSA) {
-            return 'Diperiksa';
+        if ((string)$s === self::STATUS_SELESAI) {
+            return 'Selesai';
         }
         if ((string)$s === self::STATUS_MENUNGGU) {
             return 'Menunggu';

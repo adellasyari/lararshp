@@ -63,7 +63,16 @@
                                                 <td>{{ $pet->nama ?? '-' }}</td>
                                                 <td>{{ $pet->tanggal_lahir ?? '-' }}</td>
                                                 <td>{{ $pet->warna_tanda ?? '-' }}</td>
-                                                <td>{{ $pet->jenis_kelamin ?? '-' }}</td>
+                                                <td>
+                                                    @php $jk = $pet->jenis_kelamin ?? ''; @endphp
+                                                    @if($jk === 'J' || $jk === 'L')
+                                                        Jantan
+                                                    @elseif($jk === 'B' || $jk === 'P')
+                                                        Betina
+                                                    @else
+                                                        {{ $jk ?: '-' }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ optional(optional($pet->pemilik)->user)->name ?? optional($pet->pemilik)->nama ?? '-' }}</td>
                                                 <td>{{ optional($pet->rasHewan)->nama_ras ?? 'N/A' }}</td>
                                                 <td>
