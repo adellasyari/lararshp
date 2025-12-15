@@ -19,7 +19,7 @@ class RekamMedisController extends Controller
             'pet.pemilik.user', // pet -> pemilik -> user
             'pet.rasHewan',     // pet -> rasHewan
             'roleUser.user'     // dokter via roleUser -> user
-        ])->latest()->get();
+        ])->orderByDesc('idrekam_medis')->get();
 
         return view('admin.rekam-medis.index', compact('rekamMedis'));
     }

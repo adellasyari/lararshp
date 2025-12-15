@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Dokter;
+use App\Models\RoleUser;
 use App\Models\Pemilik;
 use App\Models\Pet;
 use App\Models\RekamMedis;
@@ -45,25 +46,52 @@ class DokterController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'id_user' => 'required|exists:users,id|unique:dokter,id_user',
+        // validation rules: either use existing user or create new user
+        $rules = [
             'alamat' => 'nullable|string|max:500',
             'no_hp' => 'nullable|string|max:50',
             'bidang_dokter' => 'nullable|string|max:255',
             'jenis_kelamin' => 'nullable|string|max:10',
-        ]);
+        ];
 
-        // Perform the insert inside a DB transaction and log errors for diagnosis
-        \Illuminate\Support\Facades\Log::info('DokterController@store called', ['id_user' => $request->id_user]);
+        $creatingUser = $request->has('create_user') && $request->create_user;
+        if ($creatingUser) {
+            $rules['name'] = 'required|string|max:255';
+            $rules['email'] = 'required|email|unique:users,email';
+            $rules['password'] = 'required|string|min:6|confirmed';
+        } else {
+            $rules['id_user'] = 'required|exists:users,id|unique:dokter,id_user';
+        }
+
+        $validated = $request->validate($rules);
+
+        \Illuminate\Support\Facades\Log::info('DokterController@store called', ['creatingUser' => $creatingUser, 'id_user' => $request->id_user ?? null]);
+
         DB::beginTransaction();
         try {
-            // Ensure the application user exists
-            $user = User::find($request->id_user);
-            if (!$user) {
-                return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `users`.');
+            if ($creatingUser) {
+                // create the user
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+                // ensure role_user entry for Dokter (idrole = 2)
+                RoleUser::firstOrCreate([
+                    'iduser' => $user->id,
+                    'idrole' => 2,
+                ], [
+                    'status' => 1,
+                ]);
+            } else {
+                $user = User::find($request->id_user);
+                if (! $user) {
+                    return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `users`.');
+                }
             }
 
-            // Ensure legacy `users` table has matching id for FK constraints
+            // Ensure legacy `users` row exists for FK (if project still needs it)
             $existsInLegacy = DB::table('users')->where('id', $user->id)->exists();
             if (! $existsInLegacy) {
                 DB::table('users')->insert([
@@ -77,9 +105,10 @@ class DokterController extends Controller
                 \Illuminate\Support\Facades\Log::info('Inserted legacy users row for FK', ['id' => $user->id]);
             }
 
+            // create dokter row, set id_dokter to user's id (consistent with existing app conventions)
             $dokter = Dokter::create([
-                'id_dokter' => $request->id_user, // PK manual
-                'id_user' => $request->id_user,
+                'id_dokter' => $user->id,
+                'id_user' => $user->id,
                 'alamat' => $request->alamat,
                 'no_hp' => $request->no_hp,
                 'bidang_dokter' => $request->bidang_dokter,

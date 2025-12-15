@@ -7,10 +7,14 @@ use Illuminate\Http\Request;
 // PASTIKAN INI MEMANGGIL MODEL YANG BENAR
 use App\Models\Pemilik; 
 use App\Models\User;
+use App\Models\RoleUser;
+use App\Models\Role;
 use App\Models\Pet;
 use App\Models\RekamMedis;
 use App\Models\TemuDokter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class PemilikController extends Controller
 {
@@ -37,13 +41,49 @@ class PemilikController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validatePemilik($request);
+        $creatingUser = $request->has('create_user') && $request->create_user;
 
+        if ($creatingUser) {
+            // validate both pemilik data and new user data
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:6|confirmed',
+                'no_wa' => 'required|string|min:8|max:20',
+                'alamat' => 'nullable|string|max:500',
+            ]);
+        } else {
+            $this->validatePemilik($request);
+        }
+
+        DB::beginTransaction();
         try {
-            $this->createPemilik($request->only('iduser','no_wa','alamat'));
+            if ($creatingUser) {
+                // create user and assign role 5 (Pemilik)
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+                RoleUser::firstOrCreate([
+                    'iduser' => $user->id,
+                    'idrole' => 5,
+                ], ['status' => 1]);
+
+                $iduser = $user->id;
+            } else {
+                $iduser = $request->input('iduser');
+            }
+
+            $this->createPemilik(['iduser' => $iduser, 'no_wa' => $request->input('no_wa'), 'alamat' => $request->input('alamat')]);
+
+            DB::commit();
             return redirect()->route('admin.pemilik.index')->with('success', 'Data pemilik berhasil disimpan.');
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage())->withInput();
+            DB::rollBack();
+            Log::error('Failed store pemilik', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Gagal menyimpan data pemilik: ' . $e->getMessage())->withInput();
         }
     }
 

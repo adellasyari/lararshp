@@ -43,28 +43,55 @@ class PerawatController extends Controller
      */
     public function store(Request $request)
     {
-        // The perawat create form now selects an existing user via `id_user`.
-        $request->validate([
-            'id_user' => 'required|exists:users,id|unique:perawat,id_user',
+        // Support creating a new user inline, or using an existing user
+        $rules = [
             'alamat' => 'nullable|string|max:500',
             'no_hp' => 'nullable|string|max:50',
             'pendidikan' => 'nullable|string|max:255',
             'jenis_kelamin' => 'nullable|string|max:10',
-        ]);
+        ];
 
-        // Use transaction to ensure consistency
-        \Illuminate\Support\Facades\Log::info('PerawatController@store called', ['id_user' => $request->id_user]);
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        $creatingUser = $request->has('create_user') && $request->create_user;
+        if ($creatingUser) {
+            $rules['name'] = 'required|string|max:255';
+            $rules['email'] = 'required|email|unique:users,email';
+            $rules['password'] = 'required|string|min:6|confirmed';
+        } else {
+            $rules['id_user'] = 'required|exists:users,id|unique:perawat,id_user';
+        }
+
+        $validated = $request->validate($rules);
+
+        Log::info('PerawatController@store called', ['creatingUser' => $creatingUser, 'id_user' => $request->id_user ?? null]);
+        DB::beginTransaction();
         try {
-            $user = User::find($request->id_user);
-            if (! $user) {
-                return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `users`.');
+            if ($creatingUser) {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+
+                // assign both Perawat (3) and Pemilik (5) roles
+                RoleUser::firstOrCreate(['iduser' => $user->id, 'idrole' => 3], ['status' => 1]);
+                RoleUser::firstOrCreate(['iduser' => $user->id, 'idrole' => 5], ['status' => 1]);
+            } else {
+                $user = User::find($request->id_user);
+                if (! $user) {
+                    return back()->withInput()->with('error', 'User tidak ditemukan pada tabel `users`.');
+                }
+
+                // ensure Perawat role is attached to existing user
+                $role = Role::where('nama_role', 'Perawat')->first();
+                if ($role) {
+                    $user->roles()->syncWithoutDetaching([$role->idrole => ['status' => 1]]);
+                }
             }
 
-            // ensure legacy users table has a matching row for FK constraints (perawat.id_user -> users.id)
-            $existsInLegacy = \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->exists();
+            // ensure legacy users row exists for FK if required
+            $existsInLegacy = DB::table('users')->where('id', $user->id)->exists();
             if (! $existsInLegacy) {
-                \Illuminate\Support\Facades\DB::table('users')->insert([
+                DB::table('users')->insert([
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
@@ -72,13 +99,6 @@ class PerawatController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-            }
-
-            // assign Perawat role via pivot if not already assigned
-            $role = Role::where('nama_role', 'Perawat')->first();
-            if ($role) {
-                // use syncWithoutDetaching to avoid duplicate entries
-                $user->roles()->syncWithoutDetaching([$role->idrole => ['status' => 1]]);
             }
 
             // create perawat record
@@ -90,11 +110,11 @@ class PerawatController extends Controller
                 'jenis_kelamin' => $request->jenis_kelamin,
             ]);
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
             return redirect()->route('admin.perawat.index')->with('success', 'Perawat berhasil ditambahkan.');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Failed to create Perawat', ['error' => $e->getMessage()]);
+            DB::rollBack();
+            Log::error('Failed to create Perawat', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal menambah perawat: ' . $e->getMessage());
         }
     }

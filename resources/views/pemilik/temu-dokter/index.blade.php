@@ -58,6 +58,7 @@
                                             <th>No. Urut</th>
                                             <th>Nama Hewan</th>
                                             <th>Dokter</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -69,6 +70,14 @@
                                                 <td>{{ $t->no_urut ?? '-' }}</td>
                                                 <td>{{ optional($t->pet)->nama ?? '-' }}</td>
                                                 <td>{{ optional(optional($t->dokter)->user)->name ?? optional($t->dokter)->nama ?? '-' }}</td>
+                                                <td>
+                                                    @php $s = $t->status ?? null; @endphp
+                                                    @if((string)$s === \App\Models\TemuDokter::STATUS_SELESAI)
+                                                        <span class="badge bg-success">{{ $t->status_label }}</span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">{{ $t->status_label }}</span>
+                                                    @endif
+                                                </td>
                                                 
                                             </tr>
                                         @endforeach
